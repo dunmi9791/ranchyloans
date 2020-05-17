@@ -1,0 +1,60 @@
+<odoo>
+  <data>
+    <!-- explicit list view definition -->
+    <!--
+    <record model="ir.ui.view" id="ranchyloans.list">
+      <field name="name">ranchyloans list</field>
+      <field name="model">ranchyloans.ranchyloans</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="value"/>
+          <field name="value2"/>
+        </tree>
+      </field>
+    </record>
+    -->
+
+    <!-- actions opening views on models -->
+    <!--
+    <record model="ir.actions.act_window" id="ranchyloans.action_window">
+      <field name="name">ranchyloans window</field>
+      <field name="res_model">ranchyloans.ranchyloans</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+    -->
+
+    <!-- server action to the one above -->
+    <!--
+    <record model="ir.actions.server" id="ranchyloans.action_server">
+      <field name="name">ranchyloans server</field>
+      <field name="model_id" ref="model_ranchyloans_ranchyloans"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": self._name,
+        }
+      </field>
+    </record>
+    -->
+
+    <!-- Top menu item -->
+    <!--
+    <menuitem name="ranchyloans" id="ranchyloans.menu_root"/>
+    -->
+    <!-- menu categories -->
+    <!--
+    <menuitem name="Menu 1" id="ranchyloans.menu_1" parent="ranchyloans.menu_root"/>
+    <menuitem name="Menu 2" id="ranchyloans.menu_2" parent="ranchyloans.menu_root"/>
+    -->
+    <!-- actions -->
+    <!--
+    <menuitem name="List" id="ranchyloans.menu_1_list" parent="ranchyloans.menu_1"
+              action="ranchyloans.action_window"/>
+    <menuitem name="Server to list" id="ranchyloans" parent="ranchyloans.menu_2"
+              action="ranchyloans.action_server"/>
+    -->
+  </data>
+</odoo>
