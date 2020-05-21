@@ -1,2 +1,5 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_ranchyloans_ranchyloans,ranchyloans.ranchyloans,model_ranchyloans_ranchyloans,,1,0,0,0
+access_ranchy_loans,ranchy_loans,model_loans_ranchy,,1,1,1,1
+access_ranchy_loans2,ranchy_union,model_union_ranchy,,1,1,1,1
+access_ranchy_loans3,ranchy_disburstment,model_disbursment_ranchy,,1,1,1,1
+access_ranchy_loans4,ranchy_members,model_members_ranchy,,1,1,1,1

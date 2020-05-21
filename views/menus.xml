@@ -1,0 +1,35 @@
+<odoo>
+    <data>
+        <record id="members_action" model="ir.actions.act_window">
+            <field name="name">Members</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">members.ranchy</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
+
+        <menuitem name="Ranchy Loans" id="ranchy_loans_root_menu" web_icon="ranchy_loans,static/src/img/icon.png"/>
+        <menuitem name="Members" id="ranchy_members_menu" parent="ranchy_loans_root_menu"
+              sequence="2" />
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="ranchy_loans_menu" name="Loans" parent="ranchy_loans_root_menu" sequence="3"/>
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="ranchy_collection_menu" name="Collections" parent="ranchy_loans_root_menu" sequence="4"/>
+        <!-- This Menu Item Must have a parent -->
+        <menuitem id="ranchy_settings_menu" name="Settings" parent="ranchy_loans_root_menu" sequence="5"/>
+
+
+        <!-- This Menu Item must have a parent and an action -->
+        <menuitem id="members_ranchy_members_menu" name="Members" parent="ranchy_members_menu" action="members_action" sequence="1"/>
+
+
+
+
+    </data>
+</odoo>
