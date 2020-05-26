@@ -3,3 +3,4 @@ access_ranchy_loans,ranchy_loans,model_loans_ranchy,,1,1,1,1
 access_ranchy_loans2,ranchy_union,model_union_ranchy,,1,1,1,1
 access_ranchy_loans3,ranchy_disburstment,model_disbursment_ranchy,,1,1,1,1
 access_ranchy_loans4,ranchy_members,model_members_ranchy,,1,1,1,1
+access_ranchy_loans5,ranchy_loantypes,model_loantype_ranchy,,1,1,1,1

@@ -13,8 +13,47 @@
               </p>
             </field>
         </record>
+        <record id="loans_action" model="ir.actions.act_window">
+            <field name="name">Loans</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">loans.ranchy</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
+        <record id="loantype_action" model="ir.actions.act_window">
+            <field name="name">Loan Type</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">loantype.ranchy</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
+        <record id="union_action" model="ir.actions.act_window">
+            <field name="name">Union</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">union.ranchy</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
 
-        <menuitem name="Ranchy Loans" id="ranchy_loans_root_menu" web_icon="ranchy_loans,static/src/img/ranchy.png"/>
+        <menuitem name="Ranchy Loans" id="ranchy_loans_root_menu" web_icon="ranchy_loans,static/src/img/icon.png"/>
         <menuitem name="Members" id="ranchy_members_menu" parent="ranchy_loans_root_menu"
               sequence="2" />
         <!-- This Menu Item Must have a parent -->
@@ -27,6 +66,9 @@
 
         <!-- This Menu Item must have a parent and an action -->
         <menuitem id="members_ranchy_members_menu" name="Members" parent="ranchy_members_menu" action="members_action" sequence="1"/>
+        <menuitem id="loans_ranchy_members_menu" name="Loans" parent="ranchy_loans_menu" action="loans_action" sequence="1"/>
+        <menuitem id="loantype_ranchy_menu" name="Loan Type" parent="ranchy_settings_menu" action="loantype_action" sequence="1"/>
+        <menuitem id="union_ranchy_menu" name="Union" parent="ranchy_members_menu" action="union_action" sequence="2"/>
 
 
 
