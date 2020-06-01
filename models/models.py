@@ -7,6 +7,7 @@ class LoansRanchy(models.Model):
     _name = 'loans.ranchy'
     _rec_name = 'name'
     _description = 'Tables for loans'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
     type = fields.Many2one(comodel_name="loantype.ranchy", string="Loan Type", required=False, )
@@ -61,6 +62,7 @@ class MembersRanchy(models.Model):
     _name = 'members.ranchy'
     _rec_name = 'name'
     _description = 'members'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
     first_name = fields.Char(string="First Name", required=False, )
@@ -85,6 +87,28 @@ class MembersRanchy(models.Model):
                                  required=False, )
     loan_ids = fields.One2many(comodel_name="loans.ranchy", inverse_name="member_id", string="Loans",
                                  required=False, )
+    active = fields.Boolean(string="Active", default=True)
+    loan_count = fields.Integer(string="Loans", compute= 'get_loan_count', )
+    saving_total = fields.Float(string="saving total", compute='_saving_total')
+    withdrawal_total = fields.Float(string="withdrawal total", compute='_withdrawal_total')
+    balance = fields.Float(string="Savings Balance", compute='_balance')
+
+    def get_loan_count(self):
+        count = self.env['loans.ranchy'].search_count([('member_id', '=', self.id)])
+        self.loan_count = count
+
+    @api.one
+    @api.depends('saving_ids.amount', )
+    def _saving_total(self):
+        self.saving_total = sum(saving_id.amount for saving_id in self.saving_ids)
+
+    @api.one
+    @api.depends('withdrawal_ids.amount', )
+    def _withdrawal_total(self):
+        self.withdrawal_total = sum(withdrawal_id.amount for withdrawal_id in self.withdrawal_ids)
+
+    def _balance(self):
+        self.balance = self.saving_total - self.withdrawal_total
 
 
 class LoanType(models.Model):
@@ -93,14 +117,22 @@ class LoanType(models.Model):
     _description = 'New Description'
 
     name = fields.Char()
+    principal_amount = fields.Float(string="Principal Amount",  required=True, )
+    service_rate = fields.Float(string="Service Rate", required=True, )
+    admin_charge = fields.Float(string="Administrative Charge", required=True)
+    risk_premium = fields.Float(string="Risk Premium", required=True)
+    no_installments = fields.Float(string="Number of Installments", required=True)
+
 
 class Savings(models.Model):
     _name = 'savings.ranchy'
     _rec_name = 'name'
-    _description = 'New Description'
+    _description = 'Savings Deposit'
 
     name = fields.Char()
     member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
+    date = fields.Date(string="Date", required=False, )
+    amount = fields.Float(string="Amount", required=False, )
 
 
 class Withdrawals(models.Model):
@@ -110,6 +142,8 @@ class Withdrawals(models.Model):
 
     name = fields.Char()
     member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
+    date = fields.Date(string="Date", required=False, )
+    amount = fields.Float(string="Amount", required=False, )
 
 
 class ScheduleInstallments(models.Model):
@@ -119,6 +153,10 @@ class ScheduleInstallments(models.Model):
 
     name = fields.Char()
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan", required=False, )
+    date = fields.Date(string="Schedule Date")
+    installment = fields.Float(string="Installment Amount",  required=False, )
+    state = fields.Selection(string="State", selection=[('paid', 'Paid'), ('unpaid', 'Unpaid'), ],
+                             required=False, default='unpaid')
 
 
 class LoanPayments(models.Model):

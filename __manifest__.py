@@ -19,14 +19,17 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base'],
+    'depends': ['base', 'mail'],
 
     # always loaded
     'data': [
+        'wizard/collection.xml',
         'security/ir.model.access.csv',
+        'views/menus.xml',
         'views/views.xml',
         'views/templates.xml',
-        'views/menus.xml',
+
+
     ],
     # only loaded in demonstration mode
     'demo': [

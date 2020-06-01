@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+     <record id="collect_repayment_form" model="ir.ui.view">
+         <field name="name">collect.repayment.wizard</field>
+         <field name="model">collect.amount</field>
+         <field name="arch" type="xml">
+            <form string="Collect Repayment">
+                <group>
+                    <field name="member_id"/>
+                    <field name="group"/>
+                    <field name="co_id"/>
+                    <field name="scheduled_amount"/>
+                    <field name="collected_amount"/>
+                    <field name="balance"/>
+                    <field name="loan_id"/>
+                </group>
+                <footer>
+
+                    <button name="collect_amount" string="Enter Collection" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+         </field>
+     </record>
+
+    <record id="collect_amount_wizard" model="ir.actions.act_window">
+        <field name="name">Collect Amount</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">collect.amount</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="collect_repayment_form"/>
+        <field name="target">new</field>
+    </record>
+    <record id="withdraw_amount_form" model="ir.ui.view">
+         <field name="name">withdraw.amount.wizard</field>
+         <field name="model">withdraw.amount</field>
+         <field name="arch" type="xml">
+            <form string="Withdraw Amount">
+                <group>
+                    <field name="member_id"/>
+                    <field name="group"/>
+                    <field name="co_id"/>
+                    <field name="amount"/>
+                    <field name="balance"/>
+                </group>
+                <footer>
+
+                    <button name="withdraw_amount" string="Enter Withdrawal" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+         </field>
+     </record>
+    <record id="withdraw_amount_wizard" model="ir.actions.act_window">
+        <field name="name">Withdraw Amount</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">withdraw.amount</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="withdraw_amount_form"/>
+        <field name="target">new</field>
+    </record>
+    <record id="lapse_adjustment_form" model="ir.ui.view">
+         <field name="name">lapse.adjustment.wizard</field>
+         <field name="model">lapse.adjustment</field>
+         <field name="arch" type="xml">
+            <form string="Lapse Adjustment">
+                <group>
+                    <field name="member_id"/>
+                    <field name="group"/>
+                    <field name="co_id"/>
+                    <field name="amount"/>
+                    <field name="balance"/>
+                    <field name="loan_balance"/>
+                </group>
+                <footer>
+
+                    <button name="lapse_adjustment" string="Enter Adjustment" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+         </field>
+     </record>
+    <record id="lapse_adjustment_wizard" model="ir.actions.act_window">
+        <field name="name">Lapse Adjustment</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">lapse.adjustment</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="lapse_adjustment_form"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

@@ -6,6 +6,14 @@
        <field name="arch" type="xml">
            <form string="Ranchy members">
                <sheet>
+                   <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{&quot;terminology&quot;: &quot;archive&quot;}"/>
+                        </button>
+                       <button name="%(open_member_loans)d" class="oe_stat_button" type="action" icon="fa-usd">
+                            <field string="Loans" name="loan_count" widget="statinfo"/>
+                        </button>
+                    </div>
                    <group>
                        <group>
                            <field name="m_photo" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;image_medium&quot;}"/>
@@ -15,6 +23,7 @@
                        <group>
                            <field name="group_id"/>
                            <field name="b_address"/>
+                           <field name="balance"/>
                        </group>
                        <group>
                            <field name="phone"/>
@@ -39,11 +48,12 @@
                        <page string="Withdrawals">
                            <field name="withdrawal_ids"/>
                        </page>
-                       <page string="Loans">
-                           <field name="loan_ids"/>
-                       </page>
                    </notebook>
                </sheet>
+               <div class="oe_chatter">
+                 <field name="message_follower_ids" widget="mail_followers"/>
+                 <field name="message_ids" widget="mail_thread"/>
+               </div>
            </form>
        </field>
    </record>
@@ -88,6 +98,7 @@
                       </group>
                       <notebook>
                           <page string="Scheduled Installments">
+                              <button name="compute_schedule" string="Compute Schedule" class="oe_highlight"  groups="" type="object"/>
                               <field name="schedule_installments_ids"/>
                           </page>
                           <page string="Payments">
@@ -121,6 +132,63 @@
                       </notebook>
                   </sheet>
               </form>
+          </field>
+      </record>
+      <record id="ranchy_savings_tree" model="ir.ui.view">
+          <field name="name">ranchy.savings.tree</field>
+          <field name="model">savings.ranchy</field>
+          <field name="arch" type="xml">
+              <tree string="Savings">
+                  <field name="date"/>
+                  <field name="amount"/>
+              </tree>
+          </field>
+      </record>
+      <record id="ranchy_withdrawal_tree" model="ir.ui.view">
+          <field name="name">ranchy.withdrawal.tree</field>
+          <field name="model">withdrawals.ranchy</field>
+          <field name="arch" type="xml">
+              <tree string="Withdrawals">
+                  <field name="date"/>
+                  <field name="amount"/>
+              </tree>
+          </field>
+      </record>
+      <record id="ranchy_member_tree" model="ir.ui.view">
+          <field name="name">ranchy.member.tree</field>
+          <field name="model">members.ranchy</field>
+          <field name="arch" type="xml">
+              <tree string="Members">
+                  <field name="first_name"/>
+                  <field name="surname"/>
+                  <field name="phone"/>
+                  <field name="group_id"/>
+                  <field name="balance"/>
+              </tree>
+          </field>
+      </record>
+      <record id="schedule_payment_tree" model="ir.ui.view">
+          <field name="name">schedule.payment.tree</field>
+          <field name="model">schedule.installments</field>
+          <field name="arch" type="xml">
+              <tree string="Scheduled Payments">
+                  <field name="date"/>
+                  <field name="installment"/>
+                  <field name="state"/>
+              </tree>
+          </field>
+      </record>
+      <record id="loan_type_tree" model="ir.ui.view">
+          <field name="name">loan.type.tree</field>
+          <field name="model">loantype.ranchy</field>
+          <field name="arch" type="xml">
+              <tree string="Loan Type">
+                  <field name="name"/>
+                  <field name="principal_amount"/>
+                  <field name="service_rate"/>
+                  <field name="admin_charge"/>
+                  <field name="risk_premium"/>
+              </tree>
           </field>
       </record>
   </data>
