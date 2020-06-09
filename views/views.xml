@@ -63,6 +63,10 @@
           <field name="arch" type="xml">
               <form string="Loans">
                   <header>
+                      <button name="apply_loan" type="object" string="Apply for Loan" class="oe_highlight" states="draft"/>
+                      <button name="approve_loan" type="object" string="Approve Loan" class="oe_highlight" states="applied"/>
+                      <button name="disburse_loan" type="object" string="Disburse" class="oe_highlight" states="approved"/>
+                      <button name="reject" type="object" string="Reject Loan" class="oe_highlight" states="applied"/>
                       <field name="state" widget="statusbar" statusbar_visible="draft,applied,approved,disbursed,paid"/>
                   </header>
                   <sheet>
@@ -103,6 +107,15 @@
                           </page>
                           <page string="Payments">
                               <field name="payment_ids"/>
+                          </page>
+                          <page string="Guarantor Information">
+                              <group>
+                              <field name="guarantor_name"/>
+                              <field name="relationship"/>
+                              <field name="guarantor_home"/>
+                              <field name="guarantor_office"/>
+                              <field name="guarantor_phone"/>
+                              </group>
                           </page>
                       </notebook>
                   </sheet>

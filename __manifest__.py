@@ -28,6 +28,7 @@
         'views/menus.xml',
         'views/views.xml',
         'views/templates.xml',
+        'data/automation.xml',
 
 
     ],

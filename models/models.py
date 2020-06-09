@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-
+from odoo.exceptions import UserError
+from odoo.tools.translate import _
 
 class LoansRanchy(models.Model):
     _name = 'loans.ranchy'
-    _rec_name = 'name'
+    _rec_name = 'loan_no'
     _description = 'Tables for loans'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
@@ -32,11 +33,62 @@ class LoansRanchy(models.Model):
     state = fields.Selection(string="Status", selection=[('draft', 'Draft'), ('applied', 'Applied'),
                                                          ('approved', 'Approved'),
                                                          ('disbursed', 'Disbursed / Payment ongoing'),
-                                                         ('paid', 'Fully Paid'), ], required=False, )
+                                                         ('paid', 'Fully Paid'), ('cancel', 'Canceled')],
+                             required=False, default='draft')
     schedule_installments_ids = fields.One2many(comodel_name="schedule.installments", inverse_name="loan_id",
                                                 string="Schedule Installments", required=False, )
     payment_ids = fields.One2many(comodel_name="payments.ranchy", inverse_name="loan_id", string="Payments",
                                   required=False, )
+    guarantor_name = fields.Char(string="Guarantor Name", required=False)
+    relationship = fields.Char(string="Relationship with Borrower", required=False, )
+    guarantor_home = fields.Text(string="Guarantor Home Address", required=False)
+    guarantor_office = fields.Text(string="Guarantor Office Address", required=False)
+    guarantor_phone = fields.Char(string="Guarantors Phone", required=False)
+    loan_no = fields.Char(string="Loan Number", default=lambda self: _('New'),
+                          requires=False, readonly=True, trace_visibility='onchange', )
+
+    @api.multi
+    def is_allowed_transition(self, old_state, new_state):
+        allowed = [('draft', 'applied'),
+                   ('applied', 'approved'),
+                   ('applied', 'cancel'),
+                   ('approved', 'disbursed'),
+                   ('disbursed', 'paid'),
+
+                   ]
+        return (old_state, new_state) in allowed
+
+    @api.multi
+    def change_state(self, new_state):
+        for loan in self:
+            if loan.is_allowed_transition(loan.state, new_state):
+                loan.state = new_state
+            else:
+                msg = _('Moving from %s to %s is not allowed') % (loan.state, new_state)
+                raise UserError(msg)
+
+    @api.multi
+    def apply_loan(self):
+        self.change_state('applied')
+
+    @api.multi
+    def approve_loan(self):
+        self.change_state('approved')
+
+    @api.multi
+    def disburse_loan(self):
+        self.change_state('disbursed')
+
+    @api.multi
+    def reject(self):
+        self.change_state('cancel')
+
+    @api.model
+    def create(self, vals):
+        if vals.get('loan_no', _('New')) == _('New'):
+            vals['loan_no'] = self.env['ir.sequence'].next_by_code('increment_loan') or _('New')
+        result = super(LoansRanchy, self).create(vals)
+        return result
 
 
 class UnionRanchy(models.Model):
@@ -166,6 +218,11 @@ class LoanPayments(models.Model):
 
     name = fields.Char()
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan", required=False, )
+
+
+
+
+
 
 
 

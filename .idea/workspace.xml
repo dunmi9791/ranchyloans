@@ -2,16 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="5778ffae-3c8e-4f82-8825-d3e243f440b7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/static/description/icon.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wizard/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wizard/collection.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/wizard/collection.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/automation.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/__manifest__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__manifest__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/security/ir.model.access.csv" beforeDir="false" afterPath="$PROJECT_DIR$/security/ir.model.access.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/menus.xml" beforeDir="false" afterPath="$PROJECT_DIR$/views/menus.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/views.xml" beforeDir="false" afterPath="$PROJECT_DIR$/views/views.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -89,7 +84,14 @@
       <option name="project" value="LOCAL" />
       <updated>1590525381741</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Added Wizards">
+      <created>1591003113856</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1591003113858</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -110,6 +112,7 @@
     <MESSAGE value="first commit" />
     <MESSAGE value="create menus" />
     <MESSAGE value="icons" />
-    <option name="LAST_COMMIT_MESSAGE" value="icons" />
+    <MESSAGE value="Added Wizards" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Wizards" />
   </component>
 </project>
