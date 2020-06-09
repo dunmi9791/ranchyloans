@@ -3,6 +3,8 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
 from odoo.tools.translate import _
+from dateutil import relativedelta
+from datetime import datetime
 
 class LoansRanchy(models.Model):
     _name = 'loans.ranchy'
@@ -20,7 +22,7 @@ class LoansRanchy(models.Model):
     date_fullypaid = fields.Date(string="Date Last Loan was Fully Paid", required=False)
     amount_apply = fields.Float(string="Amount Applied For(principal)", required=False)
     amount_approved = fields.Float(string="Amount Approved", required=False)
-    no_install = fields.Float(string="Number of Installments", required=False)
+    no_install = fields.Integer(string="Number of Installments", required=False)
     duration = fields.Char(string="Loan Duration", required=False)
     date_first = fields.Date(string="Date First Installment is Due", required=False)
     date_last = fields.Date(string="Date Last Installment is Due", required=False)
@@ -46,6 +48,18 @@ class LoansRanchy(models.Model):
     guarantor_phone = fields.Char(string="Guarantors Phone", required=False)
     loan_no = fields.Char(string="Loan Number", default=lambda self: _('New'),
                           requires=False, readonly=True, trace_visibility='onchange', )
+    interest = fields.Float(string="Service Charge", compute='_interest')
+    payment_amount = fields.Float(string="Repayment Amount", compute='_repay_amount')
+
+    @api.one
+    @api.depends('amount_approved')
+    def _interest(self):
+        self.interest = self.amount_approved * 0.15
+
+    @api.one
+    @api.depends('interest')
+    def _repay_amount(self):
+        self.payment_amount = self.amount_approved + self.interest
 
     @api.multi
     def is_allowed_transition(self, old_state, new_state):
@@ -89,6 +103,47 @@ class LoansRanchy(models.Model):
             vals['loan_no'] = self.env['ir.sequence'].next_by_code('increment_loan') or _('New')
         result = super(LoansRanchy, self).create(vals)
         return result
+
+    @api.model
+    def _compute_flat(self, loan_amount, period, first_payment_date):
+        result = []
+
+        installment_amount = loan_amount / period
+        first_date = first_payment_date.strftime("%m-%d-%Y")
+        next_payment_date = datetime.strptime(first_date,
+                                              "%m-%d-%Y")
+        for loan_period in range(1, period + 1):
+            res = {
+                "date": next_payment_date.strftime("%m-%d-%Y"),
+                "installment": installment_amount,
+
+            }
+            result.append(res)
+            next_payment_date = next_payment_date + \
+                                relativedelta.relativedelta(
+                                    weeks=+1)
+        return result
+
+    @api.multi
+    def _compute_payment(self):
+        self.ensure_one()
+
+        obj_loan_type = self.env["loans.ranchy"]
+        obj_payment = self.env["schedule.installments"]
+
+        payment_datas = obj_loan_type._compute_flat(
+            self.payment_amount,
+            self.no_install,
+            self.date_first,)
+
+        for payment_data in payment_datas:
+            payment_data.update({"loan_id": self.id})
+            obj_payment.create(payment_data)
+
+    @api.multi
+    def compute_schedule(self):
+        for loan in self:
+            loan._compute_payment()
 
 
 class UnionRanchy(models.Model):

@@ -204,5 +204,19 @@
               </tree>
           </field>
       </record>
+      <record id="loan_tree" model="ir.ui.view">
+          <field name="name">loan.tree</field>
+          <field name="model">loans.ranchy</field>
+          <field name="arch" type="xml">
+              <tree string="Loans">
+                  <field name="loan_no"/>
+                  <field name="member_id"/>
+                  <field name="group"/>
+                  <field name="app_date"/>
+                  <field name="amount_approved"/>
+                  <field name="state"/>
+              </tree>
+          </field>
+      </record>
   </data>
 </odoo>
