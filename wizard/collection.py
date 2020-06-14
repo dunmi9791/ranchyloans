@@ -9,18 +9,19 @@ class CollectAmount(models.TransientModel):
     member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False, )
     group = fields.Many2one(string="Group/Union", related="member_id.group_id", readonly=True, )
     co_id = fields.Many2one(related="member_id.group_id.co_id", string="Credit Officer", readonly=True, )
-    scheduled_amount = fields.Float(string="Scheduled Amount",  required=False, )
-    collected_amount = fields.Float(string="Collected Amount", required=False, )
-    balance = fields.Float(string="Balance", compute="_balance", )
-    loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan ID")
+    scheduled_amount = fields.Float(string="Scheduled Loan Amount", related="loan_id.installment_amount",  required=False, )
+    collected_amount = fields.Float(string="Collected Amount Loan", required=False, )
+    collected_savings = fields.Float(string="Collected Amount Saving", required=False, )
+    collected_by = fields.Many2one(string="Collected By", required=False, )
+    loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Active Loan", required=False)
+    linked_schedule_ids = fields.Many2many(comodel_name="schedule.installments", relation="", column1="", column2="",
+                                           string="Linked Scheduled Installments", )
 
-    @api.one
-    @api.depends('scheduled_amount')
-    def _balance(self):
-        """
-        @api.depends() should contain all fields that will be used in the calculations.
-        """
-        self.balance = self.scheduled_amount - self.collected_amount
+    @api.onchange('member_id')
+    def _onchange_member_id(self):
+        if self.member_id:
+            loan_ids = self.member_id.loan_ids.ids
+            return {'domain': {'loan_id': [('id', 'in', loan_ids), ('state', '=', 'disbursed')]}}
 
 
     @api.one

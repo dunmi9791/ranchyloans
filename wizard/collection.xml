@@ -8,13 +8,19 @@
          <field name="arch" type="xml">
             <form string="Collect Repayment">
                 <group>
+                    <group>
                     <field name="member_id"/>
-                    <field name="group"/>
-                    <field name="co_id"/>
-                    <field name="scheduled_amount"/>
+                    <field name="loan_id"  domain="[('state','=','disbursed')]"/>
                     <field name="collected_amount"/>
-                    <field name="balance"/>
-                    <field name="loan_id"/>
+                        <field name="collected_savings"/>
+                        <field name="linked_schedule_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                    </group>
+                    <group>
+                         <field name="group"/>
+                        <field name="co_id"/>
+                        <field name="scheduled_amount"/>
+                    </group>
+
                 </group>
                 <footer>
 

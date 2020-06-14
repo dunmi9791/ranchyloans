@@ -6,6 +6,7 @@ from odoo.tools.translate import _
 from dateutil import relativedelta
 from datetime import datetime
 
+
 class LoansRanchy(models.Model):
     _name = 'loans.ranchy'
     _rec_name = 'loan_no'
@@ -22,7 +23,7 @@ class LoansRanchy(models.Model):
     date_fullypaid = fields.Date(string="Date Last Loan was Fully Paid", required=False)
     amount_apply = fields.Float(string="Amount Applied For(principal)", required=False)
     amount_approved = fields.Float(string="Amount Approved", required=False)
-    no_install = fields.Integer(string="Number of Installments", required=False)
+    no_install = fields.Integer (string="Number of Installments", required=False)
     duration = fields.Char(string="Loan Duration", required=False)
     date_first = fields.Date(string="Date First Installment is Due", required=False)
     date_last = fields.Date(string="Date Last Installment is Due", required=False)
@@ -50,6 +51,7 @@ class LoansRanchy(models.Model):
                           requires=False, readonly=True, trace_visibility='onchange', )
     interest = fields.Float(string="Service Charge", compute='_interest')
     payment_amount = fields.Float(string="Repayment Amount", compute='_repay_amount')
+    installment_amount = fields.Float(string="Installment Amount", compute='_installment_amount')
 
     @api.one
     @api.depends('amount_approved')
@@ -60,6 +62,13 @@ class LoansRanchy(models.Model):
     @api.depends('interest')
     def _repay_amount(self):
         self.payment_amount = self.amount_approved + self.interest
+
+    @api.one
+    @api.depends('payment_amount')
+    def _installment_amount(self):
+        self.installment_amount = self.payment_amount / self.no_install
+
+
 
     @api.multi
     def is_allowed_transition(self, old_state, new_state):
@@ -167,7 +176,7 @@ class DisbursmentRanchy(models.Model):
 
 class MembersRanchy(models.Model):
     _name = 'members.ranchy'
-    _rec_name = 'name'
+    _rec_name = 'member_no'
     _description = 'members'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
@@ -199,6 +208,17 @@ class MembersRanchy(models.Model):
     saving_total = fields.Float(string="saving total", compute='_saving_total')
     withdrawal_total = fields.Float(string="withdrawal total", compute='_withdrawal_total')
     balance = fields.Float(string="Savings Balance", compute='_balance')
+    member_no = fields.Char(string="Member Number", default=lambda self: _('New'),
+                            requires=False, readonly=True, trace_visibility='onchange', )
+    active_loan = fields.Many2one(comodel_name="loans.ranchy", inverse_name="member_id", string="Loans",
+                                 required=False,)
+
+    @api.model
+    def create(self, vals):
+        if vals.get('member_no', _('New')) == _('New'):
+            vals['member_no'] = self.env['ir.sequence'].next_by_code('increment_member') or _('New')
+        result = super(MembersRanchy, self).create(vals)
+        return result
 
     def get_loan_count(self):
         count = self.env['loans.ranchy'].search_count([('member_id', '=', self.id)])
@@ -273,6 +293,32 @@ class LoanPayments(models.Model):
 
     name = fields.Char()
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan", required=False, )
+
+
+class CollectionRanchy(models.Model):
+    _name = 'collection.ranchy'
+    _rec_name = 'name'
+    _description = 'New Description'
+
+    name = fields.Char()
+    collected_by = fields.Many2one(comodel_name="res.users", string="Collected By", required=False, )
+    member = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
+    group = fields.Many2one(string="Group/Union", related="member.group_id", readonly=True,)
+    scheduled = fields.Float(string="Expected Installment", related="loan_id.installment_amount")
+    loan_id = fields.Many2one(string="Active Loan", comodel_name="loans.ranchy")
+    collect_loan = fields.Integer(string="Collected Loan amount", )
+    collect_savings = fields.Integer(string="Collected Savings",)
+    no_installments = fields.Integer(string="number of installments", compute="_no_installment")
+    linked_installments_ids = fields.Many2many(comodel_name="schedule.installments", relation="collection_schedule_rel", column1="collection_id", column2="schedule_id", string="Linked Installments", )
+    state = fields.Selection(string="", selection=[('draft', 'Draft'), ('collected', 'Collected'),
+                                                   ('confirmed', 'Confirmed'), ], required=False, )
+
+    @api.one
+    @api.depends('collect_loan')
+    def _no_installment(self):
+        self.no_installments = self.collect_loan / self.scheduled
+
+
 
 
 

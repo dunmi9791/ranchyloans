@@ -17,6 +17,7 @@
                    <group>
                        <group>
                            <field name="m_photo" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;image_medium&quot;}"/>
+                           <field name="member_no"/>
                            <field name="first_name"/>
                            <field name="surname"/>
                        </group>
@@ -172,11 +173,12 @@
           <field name="model">members.ranchy</field>
           <field name="arch" type="xml">
               <tree string="Members">
+                  <field name="member_no"/>
                   <field name="first_name"/>
                   <field name="surname"/>
                   <field name="phone"/>
                   <field name="group_id"/>
-                  <field name="balance"/>
+
               </tree>
           </field>
       </record>
@@ -218,5 +220,15 @@
               </tree>
           </field>
       </record>
+      <record model="ir.ui.view" id="schedule_payments_calendar">
+            <field name="name">schedule.payments.calendar</field>
+            <field name="model">schedule.installments</field>
+            <field name="arch" type="xml">
+                <calendar string="Schedule Payment Calendar" date_start="date" color="state">
+                    <field name="installment" widget="monetary"/>
+                </calendar>
+            </field>
+        </record>
+
   </data>
 </odoo>

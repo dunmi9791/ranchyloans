@@ -65,6 +65,19 @@
           </p>
         </field>
     </record>
+        <record id="scheduled_payments" model="ir.actions.act_window">
+            <field name="name">scheduled_payments</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">schedule.installments</field>
+            <field name="view_mode">calendar</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
 
 
         <menuitem name="Ranchy Loans" id="ranchy_loans_root_menu" web_icon="ranchyloans,static/src/img/icon.png"/>
@@ -87,6 +100,7 @@
         <menuitem id="repayment_ranchy_menu" name="Loan Repayment" parent="ranchy_collection_menu" action="collect_amount_wizard" sequence="2"/>
         <menuitem id="withdrawal_ranchy_menu" name="Withdrawals" parent="ranchy_collection_menu" action="withdraw_amount_wizard" sequence="3"/>
         <menuitem id="adjustment_ranchy_menu" name="Lapse Adjustment" parent="ranchy_collection_menu" action="lapse_adjustment_wizard" sequence="4"/>
+        <menuitem id="scheduled_ranchy_menu" name="Scheduled Payments" parent="ranchy_collection_menu" action="scheduled_payments" sequence="5"/>
 
 
 
