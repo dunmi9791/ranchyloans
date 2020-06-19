@@ -93,11 +93,10 @@
                               <field name="date_last"/>
                           </group>
                           <group>
-                              <field name="is_family"/>
-                              <field name="name_family"/>
-                              <field name="is_indebted"/>
-                              <field name="indebted_amount"/>
-                              <field name="indebted_mfb"/>
+
+                              <field name="payment_amount"/>
+                              <field name="total_realised" widget="progressbar" options="{'current_value': 'total_realised', 'max_value': 'payment_amount', 'editable': false}"/>
+
 
                           </group>
                       </group>
@@ -116,6 +115,15 @@
                               <field name="guarantor_home"/>
                               <field name="guarantor_office"/>
                               <field name="guarantor_phone"/>
+                              </group>
+                          </page>
+                          <page string="Other MFB Indebtedness">
+                              <group>
+                                  <field name="is_family"/>
+                                  <field name="name_family"/>
+                                  <field name="is_indebted"/>
+                                  <field name="indebted_amount"/>
+                                  <field name="indebted_mfb"/>
                               </group>
                           </page>
                       </notebook>
@@ -229,6 +237,66 @@
                 </calendar>
             </field>
         </record>
+      <record id="collected_tree_view" model="ir.ui.view">
+          <field name="name">collected.tree</field>
+          <field name="model">collection.ranchy</field>
+          <field name="arch" type="xml">
+              <tree string="">
+                  <field name="date"/>
+                  <field name="collected_by"/>
+                  <field name="member"/>
+                  <field name="group"/>
+                  <field name="collect_loan" widget="monetary"/>
+                  <field name="collect_savings" widget="monetary"/>
+                  <field name="collected_total" widget="monetary" sum="Total"/>
+                  <field name="state"/>
+
+              </tree>
+          </field>
+      </record>
+      <record id="collected_form" model="ir.ui.view">
+          <field name="name">collected.form</field>
+          <field name="model">collection.ranchy</field>
+          <field name="arch" type="xml">
+              <form string="Collections">
+                  <header>
+                  <button name="confirm_collection" type="object" string="Confirm Collection" class="oe_highlight" states="collected"/>
+                      <field name="state" widget="statusbar" statusbar_visible="draft,collected,confirmed"/>
+                  </header>
+                  <sheet>
+                      <group>
+                          <group>
+                              <field name="member"/>
+                              <field name="loan_id"/>
+                              <field name="collect_loan"/>
+                              <field name="collect_savings"/>
+                              <field name="no_installments"/>
+                          </group>
+                          <group>
+                              <field name="group"/>
+                              <field name="scheduled"/>
+                              <field name="linked_installments_ids" widget="many2many_tags"/>
+                          </group>
+                          <group>
+                              <field name="collected_by"/>
+                              <field name="collected_total"/>
+                              <field name="date"/>
+                          </group>
+                      </group>
+                  </sheet>
+              </form>
+          </field>
+      </record>
+      <record id="payments_tree" model="ir.ui.view">
+          <field name="name">payments.tree</field>
+          <field name="model">payments.ranchy</field>
+          <field name="arch" type="xml">
+              <tree string="">
+                  <field name="date"/>
+                  <field name="amount"/>
+              </tree>
+          </field>
+      </record>
 
   </data>
 </odoo>

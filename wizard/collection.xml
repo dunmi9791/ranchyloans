@@ -11,14 +11,16 @@
                     <group>
                     <field name="member_id"/>
                     <field name="loan_id"  domain="[('state','=','disbursed')]"/>
-                    <field name="collected_amount"/>
-                        <field name="collected_savings"/>
+                    <field name="collected_amount" widget="monetary"/>
+                        <field name="collected_savings" widget="monetary"/>
+                        <field name="no_installments"/>
                         <field name="linked_schedule_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
                     </group>
                     <group>
                          <field name="group"/>
                         <field name="co_id"/>
                         <field name="scheduled_amount"/>
+                        <field name="collected_total" widget="monetary"/>
                     </group>
 
                 </group>
@@ -45,11 +47,12 @@
          <field name="arch" type="xml">
             <form string="Withdraw Amount">
                 <group>
+                    <field name="date"/>
                     <field name="member_id"/>
                     <field name="group"/>
                     <field name="co_id"/>
-                    <field name="amount"/>
-                    <field name="balance"/>
+                    <field name="amount" widget="monetary"/>
+                    <field name="balance" widget="monetary"/>
                 </group>
                 <footer>
 

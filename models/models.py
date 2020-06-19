@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 from odoo.tools.translate import _
 from dateutil import relativedelta
 from datetime import datetime
+from datetime import date
 
 
 class LoansRanchy(models.Model):
@@ -13,7 +14,6 @@ class LoansRanchy(models.Model):
     _description = 'Tables for loans'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char()
     type = fields.Many2one(comodel_name="loantype.ranchy", string="Loan Type", required=False, )
     app_date = fields.Date(string="Date of Application", required=False, )
     member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False, )
@@ -52,6 +52,24 @@ class LoansRanchy(models.Model):
     interest = fields.Float(string="Service Charge", compute='_interest')
     payment_amount = fields.Float(string="Repayment Amount", compute='_repay_amount')
     installment_amount = fields.Float(string="Installment Amount", compute='_installment_amount')
+    total_realisable = fields.Integer(string="Expected Realisation", compute='_total_realisable')
+    total_realised = fields.Integer(string="Realised Total", compute='_total_realised')
+    balance_loan = fields.Integer(string="Loan Balance", compute='_loan_balance', )
+
+
+
+    @api.one
+    @api.depends('schedule_installments_ids.installment', )
+    def _total_realisable(self):
+
+        self.total_realisable = sum(schedule.installment for schedule in self.schedule_installments_ids)
+
+    @api.one
+    @api.depends('schedule_installments_ids.installment', )
+    def _total_realised(self):
+
+        self.total_realised = sum(paid.installment
+                                  for paid in self.schedule_installments_ids.filtered(lambda o: o.state == 'paid'))
 
     @api.one
     @api.depends('amount_approved')
@@ -68,7 +86,10 @@ class LoansRanchy(models.Model):
     def _installment_amount(self):
         self.installment_amount = self.payment_amount / self.no_install
 
-
+    @api.one
+    @api.depends('payment_amount')
+    def _loan_balance(self):
+        self.loan_balance = self.payment_amount - self.total_realised
 
     @api.multi
     def is_allowed_transition(self, old_state, new_state):
@@ -259,7 +280,7 @@ class Savings(models.Model):
     name = fields.Char()
     member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
     date = fields.Date(string="Date", required=False, )
-    amount = fields.Float(string="Amount", required=False, )
+    amount = fields.Integer(string="Amount", required=False, )
 
 
 class Withdrawals(models.Model):
@@ -275,7 +296,7 @@ class Withdrawals(models.Model):
 
 class ScheduleInstallments(models.Model):
     _name = 'schedule.installments'
-    _rec_name = 'name'
+    _rec_name = 'installment'
     _description = 'New Description'
 
     name = fields.Char()
@@ -285,6 +306,26 @@ class ScheduleInstallments(models.Model):
     state = fields.Selection(string="State", selection=[('paid', 'Paid'), ('unpaid', 'Unpaid'), ],
                              required=False, default='unpaid')
 
+    @api.multi
+    def is_allowed_transition(self, old_state, new_state):
+        allowed = [('unpaid', 'paid'),
+
+                   ]
+        return (old_state, new_state) in allowed
+
+    @api.multi
+    def change_state(self, new_state):
+        for installment in self:
+            if installment.is_allowed_transition(installment.state, new_state):
+                installment.state = new_state
+            else:
+                msg = _('Moving from %s to %s is not allowed') % (installment.state, new_state)
+                raise UserError(msg)
+
+    @api.multi
+    def apply_paid(self):
+        self.change_state('paid')
+
 
 class LoanPayments(models.Model):
     _name = 'payments.ranchy'
@@ -293,15 +334,16 @@ class LoanPayments(models.Model):
 
     name = fields.Char()
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan", required=False, )
+    amount = fields.Integer(string="Amount Paid")
+    date = fields.Date(string="Date")
 
 
 class CollectionRanchy(models.Model):
     _name = 'collection.ranchy'
-    _rec_name = 'name'
-    _description = 'New Description'
+    _rec_name = 'member'
+    _description = 'table of collections'
 
     name = fields.Char()
-    collected_by = fields.Many2one(comodel_name="res.users", string="Collected By", required=False, )
     member = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
     group = fields.Many2one(string="Group/Union", related="member.group_id", readonly=True,)
     scheduled = fields.Float(string="Expected Installment", related="loan_id.installment_amount")
@@ -312,11 +354,67 @@ class CollectionRanchy(models.Model):
     linked_installments_ids = fields.Many2many(comodel_name="schedule.installments", relation="collection_schedule_rel", column1="collection_id", column2="schedule_id", string="Linked Installments", )
     state = fields.Selection(string="", selection=[('draft', 'Draft'), ('collected', 'Collected'),
                                                    ('confirmed', 'Confirmed'), ], required=False, )
+    collected_by = fields.Many2one('res.users', 'Collected By', default=lambda self: self.env.user)
+    collected_total = fields.Integer(string="Total Collected", compute="_total_collected",)
+    date = fields.Date(string="Date", required=False, default=date.today())
+
+
+
+
+    @api.one
+    @api.depends('collect_loan', 'collect_savings')
+    def _total_collected(self):
+        self.collected_total = self.collect_loan + self.collect_savings
+
 
     @api.one
     @api.depends('collect_loan')
     def _no_installment(self):
         self.no_installments = self.collect_loan / self.scheduled
+
+    @api.multi
+    def is_allowed_transition(self, old_state, new_state):
+        allowed = [('draft', 'collected'),
+                   ('collected', 'confirmed'),
+
+                   ]
+        return (old_state, new_state) in allowed
+
+    @api.multi
+    def change_state(self, new_state):
+        for collection in self:
+            if collection.is_allowed_transition(collection.state, new_state):
+                collection.state = new_state
+            else:
+                msg = _('Moving from %s to %s is not allowed') % (collection.state, new_state)
+                raise UserError(msg)
+
+    def confirm_collection(self):
+        savings = self.env['savings.ranchy']
+        vals = {
+            'member_id': self.member.id,
+            'amount': self.collect_savings,
+            'date': self.date,
+        }
+        savings.create(vals)
+        loan_repayment = self.env['payments.ranchy']
+        values = {
+            'loan_id': self.loan_id.id,
+            'amount': self.collect_loan,
+            'date': self.date,
+
+        }
+        loan_repayment.create(values)
+        schedule = self.env['schedule.installments']
+        install_id = self.linked_installments_ids.id
+        install = schedule.browse(install_id)
+
+        install.apply_paid()
+        self.change_state('confirmed')
+
+    def schedule(self):
+        sch = self.env['schedule.installments'].apply_paid
+        return sch
 
 
 
