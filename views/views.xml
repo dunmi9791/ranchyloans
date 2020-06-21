@@ -82,11 +82,11 @@
                               <field name="avg_monthly"/>
                               <field name="last_loan"/>
                               <field name="date_fullypaid"/>
-                              <field name="amount_apply"/>
-                              <field name="savings_balance"/>
+                              <field name="amount_apply" widget="monetary"/>
+                              <field name="savings_balance" widget="monetary"/>
                           </group>
                           <group>
-                              <field name="amount_approved"/>
+                              <field name="amount_approved" widget="monetary"/>
                               <field name="no_install"/>
                               <field name="duration"/>
                               <field name="date_first"/>
@@ -94,8 +94,9 @@
                           </group>
                           <group>
 
-                              <field name="payment_amount"/>
+                              <field name="payment_amount" widget="monetary"/>
                               <field name="total_realised" widget="progressbar" options="{'current_value': 'total_realised', 'max_value': 'payment_amount', 'editable': false}"/>
+                              <field name="balance_loan" widget="monetary"/>
 
 
                           </group>
@@ -128,6 +129,10 @@
                           </page>
                       </notebook>
                   </sheet>
+                  <div class="oe_chatter">
+                 <field name="message_follower_ids" widget="mail_followers"/>
+                 <field name="message_ids" widget="mail_thread"/>
+               </div>
               </form>
           </field>
       </record>
@@ -144,15 +149,21 @@
                           </group>
                           <group>
                               <field name="co_id"/>
+                              <field name="union_day"/>
                           </group>
                       </group>
                       <notebook>
                           <page string="Members">
-                              <field name="members_ids"/>
+                              <field name="members_ids" readonly="1"/>
 
                           </page>
                       </notebook>
                   </sheet>
+                   <div class="oe_chatter">
+                 <field name="message_follower_ids" widget="mail_followers"/>
+                 <field name="message_ids" widget="mail_thread"/>
+               </div>
+
               </form>
           </field>
       </record>
@@ -294,6 +305,47 @@
               <tree string="">
                   <field name="date"/>
                   <field name="amount"/>
+              </tree>
+          </field>
+      </record>
+      <record id="withdraw_request_form" model="ir.ui.view">
+          <field name="name">withdraw.request.form</field>
+          <field name="model">withdraw.request</field>
+          <field name="arch" type="xml">
+              <form string="">
+                  <header>
+                      <button name="%(ranchyloans.withdraw_amount_wizard)d" context="{'default_member_id': member_id, 'default_request_id': active_id}" type="action" string="Disburse Withdrawal" class="oe_highlight" states="requested"/>
+                      <button name="reject_withdrawal" type="object" string="Reject Withdrawal" class="oe_highlight" states="requested"/>
+                      <button name="request_withdrawal" type="object" string="Request Withdrawal" class="oe_highlight" states="draft"/>
+                      <field name="state" widget="statusbar" statusbar_visible="draft,requested,disbursed,rejected"/>
+                  </header>
+                  <sheet>
+                      <group>
+                          <field name="member_id"/>
+                          <field name="group"/>
+                          <field name="request_date"/>
+                          <field name="disburse_date"/>
+                          <field name="amount"/>
+                          <field name="note"/>
+                      </group>
+                  </sheet>
+                  <div class="oe_chatter">
+                 <field name="message_follower_ids" widget="mail_followers"/>
+                 <field name="message_ids" widget="mail_thread"/>
+               </div>
+              </form>
+          </field>
+      </record>
+      <record id="withdraw_request_tree" model="ir.ui.view">
+          <field name="name">withdraw.request.tree</field>
+          <field name="model">withdraw.request</field>
+          <field name="arch" type="xml">
+              <tree string="Withdraw Request">
+                  <field name="request_date"/>
+                  <field name="member_id"/>
+                  <field name="group"/>
+                  <field name="amount"/>
+                  <field name="state"/>
               </tree>
           </field>
       </record>

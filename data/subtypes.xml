@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data noupdate="0">
+
+<record id="wtd_state_request" model="mail.message.subtype">
+    <field name="name">withdraw request</field>
+    <field name="res_model">withdraw.request</field>
+    <field name="default" eval="True"/>
+    <field name="description">Withdrawal Requested!</field>
+</record>
+    <record id="wtd_state_disburse" model="mail.message.subtype">
+    <field name="name">withdraw disburse</field>
+    <field name="res_model">withdraw.request</field>
+    <field name="default" eval="True"/>
+    <field name="description">Withdrawal was Disbursed!</field>
+</record>
+    <record id="wtd_state_reject" model="mail.message.subtype">
+    <field name="name">withdraw reject</field>
+    <field name="res_model">withdraw.request</field>
+    <field name="default" eval="True"/>
+    <field name="description">Withdrawal was Rejected!</field>
+</record>
+</data>
+</odoo>

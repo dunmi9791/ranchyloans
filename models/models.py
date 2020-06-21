@@ -16,13 +16,16 @@ class LoansRanchy(models.Model):
 
     type = fields.Many2one(comodel_name="loantype.ranchy", string="Loan Type", required=False, )
     app_date = fields.Date(string="Date of Application", required=False, )
-    member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False, )
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False,
+                                track_visibility=True, trace_visibility='onchange',)
     group = fields.Many2one(string="Group/Union", related="member_id.group_id", readonly=True,)
     avg_monthly = fields.Float(string="Average Monthly Income",  required=False, )
     last_loan = fields.Float(string="Last Loan Received", required=False, )
     date_fullypaid = fields.Date(string="Date Last Loan was Fully Paid", required=False)
-    amount_apply = fields.Float(string="Amount Applied For(principal)", required=False)
-    amount_approved = fields.Float(string="Amount Approved", required=False)
+    amount_apply = fields.Float(string="Amount Applied For(principal)", required=False,
+                                track_visibility=True, trace_visibility='onchange',)
+    amount_approved = fields.Float(string="Amount Approved", required=False,
+                                   track_visibility=True, trace_visibility='onchange',)
     no_install = fields.Integer (string="Number of Installments", required=False)
     duration = fields.Char(string="Loan Duration", required=False)
     date_first = fields.Date(string="Date First Installment is Due", required=False)
@@ -37,16 +40,19 @@ class LoansRanchy(models.Model):
                                                          ('approved', 'Approved'),
                                                          ('disbursed', 'Disbursed / Payment ongoing'),
                                                          ('paid', 'Fully Paid'), ('cancel', 'Canceled')],
-                             required=False, default='draft')
+                             required=False, default='draft', track_visibility=True, trace_visibility='onchange',)
     schedule_installments_ids = fields.One2many(comodel_name="schedule.installments", inverse_name="loan_id",
                                                 string="Schedule Installments", required=False, )
     payment_ids = fields.One2many(comodel_name="payments.ranchy", inverse_name="loan_id", string="Payments",
                                   required=False, )
-    guarantor_name = fields.Char(string="Guarantor Name", required=False)
+    guarantor_name = fields.Char(string="Guarantor Name", required=False,
+                                 track_visibility=True, trace_visibility='onchange',)
     relationship = fields.Char(string="Relationship with Borrower", required=False, )
-    guarantor_home = fields.Text(string="Guarantor Home Address", required=False)
+    guarantor_home = fields.Text(string="Guarantor Home Address", required=False,
+                                 track_visibility=True, trace_visibility='onchange',)
     guarantor_office = fields.Text(string="Guarantor Office Address", required=False)
-    guarantor_phone = fields.Char(string="Guarantors Phone", required=False)
+    guarantor_phone = fields.Char(string="Guarantors Phone", required=False,
+                                  track_visibility=True, trace_visibility='onchange',)
     loan_no = fields.Char(string="Loan Number", default=lambda self: _('New'),
                           requires=False, readonly=True, trace_visibility='onchange', )
     interest = fields.Float(string="Service Charge", compute='_interest')
@@ -55,8 +61,6 @@ class LoansRanchy(models.Model):
     total_realisable = fields.Integer(string="Expected Realisation", compute='_total_realisable')
     total_realised = fields.Integer(string="Realised Total", compute='_total_realised')
     balance_loan = fields.Integer(string="Loan Balance", compute='_loan_balance', )
-
-
 
     @api.one
     @api.depends('schedule_installments_ids.installment', )
@@ -89,7 +93,7 @@ class LoansRanchy(models.Model):
     @api.one
     @api.depends('payment_amount')
     def _loan_balance(self):
-        self.loan_balance = self.payment_amount - self.total_realised
+        self.balance_loan = self.payment_amount - self.total_realised
 
     @api.multi
     def is_allowed_transition(self, old_state, new_state):
@@ -180,11 +184,16 @@ class UnionRanchy(models.Model):
     _name = 'union.ranchy'
     _rec_name = 'name'
     _description = 'Table of Unions'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
     members_ids = fields.One2many(comodel_name="members.ranchy", inverse_name="group_id", string="Union Members", required=False, )
-    co_id = fields.Many2one(comodel_name="hr.employee", string="Credit Officer", required=False, )
+    co_id = fields.Many2one(comodel_name="hr.employee", string="Credit Officer", required=False,
+                            track_visibility=True, trace_visibility='onchange', )
     description = fields.Text(string="Union Description", required=False, )
+    union_day = fields.Selection(string="Union Day", selection=[('monday', 'Monday'), ('tuesday', 'Tuesday'),
+                                                                ('wednesday', 'Wednesday'), ('thursday', 'Thursday'),
+                                                                ('friday', 'Friday'), ], required=False, )
 
 
 class DisbursmentRanchy(models.Model):
@@ -202,12 +211,12 @@ class MembersRanchy(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
-    first_name = fields.Char(string="First Name", required=False, )
-    surname = fields.Char(string="Surname", required=False, )
-    r_address = fields.Char(string="Residential Address", required=False, )
+    first_name = fields.Char(string="First Name", required=False, track_visibility=True, trace_visibility='onchange', )
+    surname = fields.Char(string="Surname", required=False, track_visibility=True, trace_visibility='onchange', )
+    r_address = fields.Char(string="Residential Address", required=False, track_visibility=True, trace_visibility='onchange', )
     b_address = fields.Char(string="Business Address", required=False,)
-    p_address = fields.Char(string="Permanent Address", required=False,)
-    phone = fields.Char(string="Phone Number", required=False,)
+    p_address = fields.Char(string="Permanent Address", required=False, track_visibility=True, trace_visibility='onchange',)
+    phone = fields.Char(string="Phone Number", required=False, track_visibility=True, trace_visibility='onchange',)
     dob = fields.Date(string="Date of Birth", required=False, )
     marital_status = fields.Selection(string="Marital Status", selection=[('single', 'Single'), ('married', 'Married'),
                                                                           ('divorced', 'Divorced'), ('widow', 'Widow'),
@@ -215,10 +224,10 @@ class MembersRanchy(models.Model):
     formal_edu = fields.Selection(string="Formal Education", selection=[('none', 'None'), ('primary', 'Primary'),
                                                                         ('secondary', 'Secondary'),
                                                                         ('tertiary', 'Tertiary'), ], required=False)
-    nok = fields.Char(string="next of Kin", required=False)
-    nok_phone = fields.Char(string="NOK Phone", required=False)
-    group_id = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", required=False, )
-    m_photo = fields.Binary(string="",  )
+    nok = fields.Char(string="next of Kin", required=False, track_visibility=True, trace_visibility='onchange',)
+    nok_phone = fields.Char(string="NOK Phone", required=False, track_visibility=True, trace_visibility='onchange',)
+    group_id = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", required=False, track_visibility=True, trace_visibility='onchange', )
+    m_photo = fields.Binary(string="", track_visibility=True, trace_visibility='onchange', )
     saving_ids = fields.One2many(comodel_name="savings.ranchy", inverse_name="member_id", string="Savings", required=False, )
     withdrawal_ids = fields.One2many(comodel_name="withdrawals.ranchy", inverse_name="member_id", string="Withdrawals",
                                  required=False, )

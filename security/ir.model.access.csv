@@ -9,3 +9,4 @@ access_ranchy_loans7,ranchy_withdrawal,model_withdrawals_ranchy,,1,1,1,1
 access_ranchy_loans8,ranchy_installment,model_schedule_installments,,1,1,1,1
 access_ranchy_loans9,ranchy_payments,model_payments_ranchy,,1,1,1,1
 access_ranchy_loans10,ranchy_payments,model_collection_ranchy,,1,1,1,1
+access_ranchy_loans11,ranchy_withdrawr,model_withdraw_request,,1,1,1,1

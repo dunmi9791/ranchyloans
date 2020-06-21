@@ -47,6 +47,7 @@
          <field name="arch" type="xml">
             <form string="Withdraw Amount">
                 <group>
+                    <field name="request_id"/>
                     <field name="date"/>
                     <field name="member_id"/>
                     <field name="group"/>

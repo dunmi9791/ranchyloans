@@ -91,6 +91,19 @@
               </p>
             </field>
         </record>
+        <record id="withdraw_request_action" model="ir.actions.act_window">
+            <field name="name">Withdrawal Request</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">withdraw.request</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
 
 
         <menuitem name="Ranchy Loans" id="ranchy_loans_root_menu" web_icon="ranchyloans,static/src/img/icon.png"/>
@@ -115,6 +128,7 @@
         <menuitem id="adjustment_ranchy_menu" name="Lapse Adjustment" parent="ranchy_collection_menu" action="lapse_adjustment_wizard" sequence="4"/>
         <menuitem id="scheduled_ranchy_menu" name="Scheduled Payments" parent="ranchy_collection_menu" action="scheduled_payments" sequence="5"/>
         <menuitem id="collected_ranchy_menu" name="Collected Payments" parent="ranchy_collection_menu" action="collected_payments" sequence="6"/>
+        <menuitem id="withdraw_request_menu" name="Withdrawal Request" parent="ranchy_members_menu" action="withdraw_request_action" sequence="3"/>
 
 
 

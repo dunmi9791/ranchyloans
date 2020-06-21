@@ -66,17 +66,20 @@ class WithdrawAmount(models.TransientModel):
     amount = fields.Float(string="Amount",  required=False, )
     balance = fields.Float(string="Balance", related="member_id.balance", )
     date = fields.Date(string="Date", required=False, default=date.today())
+    request_id = fields.Many2one(comodel_name="withdraw.request", string="Ref Request", required=False,)
 
     @api.one
     @api.depends('')
     def withdraw_amount(self):
         withdrawal = self.env['withdrawals.ranchy']
+        requestid = self.env['withdraw.request'].browse(self.request_id.id)
         vals = {
             'member_id': self.member_id.id,
             'amount': self.amount,
             'date': self.date,
         }
         withdrawal.create(vals)
+        requestid.disburse_withdrawal()
 
 
 class LapseAdjustments(models.TransientModel):
