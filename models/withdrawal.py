@@ -75,5 +75,12 @@ class WithdrawRequest(models.Model):
         self.change_state('disbursed')
 
 
+class LoanStages(models.Model):
+    _name = 'loan.stages'
+    _rec_name = 'name'
+    _description = 'Loan Stages'
+
+    name = fields.Char()
+    principal_amount = fields.Float(string="Principal Amount",  required=False, )
 
 

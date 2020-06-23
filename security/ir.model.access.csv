@@ -1,7 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_ranchy_loans,ranchy_loans,model_loans_ranchy,,1,1,1,1
 access_ranchy_loans2,ranchy_union,model_union_ranchy,,1,1,1,1
-access_ranchy_loans3,ranchy_disburstment,model_disbursment_ranchy,,1,1,1,1
+access_ranchy_loans3,ranchy_disburstment,model_disbursement_ranchy,,1,1,1,1
 access_ranchy_loans4,ranchy_members,model_members_ranchy,,1,1,1,1
 access_ranchy_loans5,ranchy_loantypes,model_loantype_ranchy,,1,1,1,1
 access_ranchy_loans6,ranchy_savings,model_savings_ranchy,,1,1,1,1
@@ -10,3 +10,4 @@ access_ranchy_loans8,ranchy_installment,model_schedule_installments,,1,1,1,1
 access_ranchy_loans9,ranchy_payments,model_payments_ranchy,,1,1,1,1
 access_ranchy_loans10,ranchy_payments,model_collection_ranchy,,1,1,1,1
 access_ranchy_loans11,ranchy_withdrawr,model_withdraw_request,,1,1,1,1
+access_ranchy_loans12,ranchy_loanstage,model_loan_stages,,1,1,1,1

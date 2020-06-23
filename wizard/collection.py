@@ -102,3 +102,21 @@ class LapseAdjustments(models.TransientModel):
         pass
 
 
+class CollectFees(models.TransientModel):
+    _name = 'collect.fees'
+    _description = 'Collect Loan Fees Wizard'
+
+    loan_id = fields.Many2one(comodel_name="loans.ranchy", string="", required=False, )
+    date = fields.Date(string="Date", required=False, )
+    risk_premium = fields.Float(string="Risk Premium",  required=False, )
+    amount = fields.Float(string="Collected Amount",  required=False, )
+    admin_charge = fields.Float(string="Administrative Charge")
+
+    @api.one
+    @api.depends('amount')
+    def collect_fees(self):
+        """
+        @api.depends() should contain all fields that will be used in the calculations.
+        """
+        pass
+

@@ -14,9 +14,10 @@ class LoansRanchy(models.Model):
     _description = 'Tables for loans'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    type = fields.Many2one(comodel_name="loantype.ranchy", string="Loan Type", required=False, )
+    type = fields.Many2one(comodel_name="loantype.ranchy", string="Loan Type", required=True,
+                           track_visibility=True, trace_visibility='onchange' )
     app_date = fields.Date(string="Date of Application", required=False, )
-    member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False,
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=True,
                                 track_visibility=True, trace_visibility='onchange',)
     group = fields.Many2one(string="Group/Union", related="member_id.group_id", readonly=True,)
     avg_monthly = fields.Float(string="Average Monthly Income",  required=False, )
@@ -26,13 +27,13 @@ class LoansRanchy(models.Model):
                                 track_visibility=True, trace_visibility='onchange',)
     amount_approved = fields.Float(string="Amount Approved", required=False,
                                    track_visibility=True, trace_visibility='onchange',)
-    no_install = fields.Integer (string="Number of Installments", required=False)
+    no_install = fields.Integer (string="Number of Installments", related="type.no_installments", readonly=True,)
     duration = fields.Char(string="Loan Duration", required=False)
     date_first = fields.Date(string="Date First Installment is Due", required=False)
     date_last = fields.Date(string="Date Last Installment is Due", required=False)
     is_family = fields.Boolean(string="Any family member registered in the group",  )
     name_family = fields.Char(string="Name of Family Member")
-    savings_balance = fields.Float(string="Savings Balance")
+    savings_balance = fields.Float(string="Savings Balance", related="member_id.balance", readonly=True,)
     is_indebted = fields.Boolean(string="Are You Indebted to any MFB/MFI",  )
     indebted_amount = fields.Float(string="Indebted Amount")
     indebted_mfb = fields.Char(string="MFB/MFI Name")
@@ -61,6 +62,18 @@ class LoansRanchy(models.Model):
     total_realisable = fields.Integer(string="Expected Realisation", compute='_total_realisable')
     total_realised = fields.Integer(string="Realised Total", compute='_total_realised')
     balance_loan = fields.Integer(string="Loan Balance", compute='_loan_balance', )
+    is_computed = fields.Boolean(string="Computed",  )
+    interest_rate = fields.Float(string="Interest Rate", related="type.service_rate", readonly=True,)
+    stage_id = fields.Many2one(comodel_name="loan.stages", string="Loan Stage", required=False, )
+    riskpremium_rate = fields.Float(string="Premium Rate", related="type.risk_premium", readonly=True, )
+    admin_charge = fields.Float(string="Administrative Charge", related="type.admin_charge", readonly=True,)
+    risk_premium_amount = fields.Float(string="Risk Premium", compute='_risk_premium',)
+    fee_paid = fields.Boolean(string="Fees Paid")
+
+    @api.one
+    @api.depends('amount_approved')
+    def _risk_premium(self):
+        self.risk_premium_amount = self.amount_approved * (self.riskpremium_rate / 100)
 
     @api.one
     @api.depends('schedule_installments_ids.installment', )
@@ -78,7 +91,7 @@ class LoansRanchy(models.Model):
     @api.one
     @api.depends('amount_approved')
     def _interest(self):
-        self.interest = self.amount_approved * 0.15
+        self.interest = self.amount_approved * (self.interest_rate / 100)
 
     @api.one
     @api.depends('interest')
@@ -158,26 +171,60 @@ class LoansRanchy(models.Model):
                                     weeks=+1)
         return result
 
+    @api.model
+    def _compute_monthly(self, loan_amount, period, first_payment_date):
+        result = []
+
+        installment_amount = loan_amount / period
+        first_date = first_payment_date.strftime("%m-%d-%Y")
+        next_payment_date = datetime.strptime(first_date,
+                                              "%m-%d-%Y")
+        for loan_period in range(1, period + 1):
+            res = {
+                "date": next_payment_date.strftime("%m-%d-%Y"),
+                "installment": installment_amount,
+
+            }
+            result.append(res)
+            next_payment_date = next_payment_date + \
+                                relativedelta.relativedelta(
+                                    months=+1)
+        return result
+
     @api.multi
     def _compute_payment(self):
         self.ensure_one()
 
         obj_loan_type = self.env["loans.ranchy"]
         obj_payment = self.env["schedule.installments"]
+        if self.type.installment_period == 'weekly':
+            payment_datas = obj_loan_type._compute_flat(
+                self.payment_amount,
+                self.no_install,
+                self.date_first,)
+            for payment_data in payment_datas:
+                payment_data.update({"loan_id": self.id})
+                obj_payment.create(payment_data)
 
-        payment_datas = obj_loan_type._compute_flat(
-            self.payment_amount,
-            self.no_install,
-            self.date_first,)
+        elif self.type.installment_period == 'monthly':
+            payment_datas = obj_loan_type._compute_monthly(
+                self.payment_amount,
+                self.no_install,
+                self.date_first, )
 
-        for payment_data in payment_datas:
-            payment_data.update({"loan_id": self.id})
-            obj_payment.create(payment_data)
+            for payment_data in payment_datas:
+                payment_data.update({"loan_id": self.id})
+                obj_payment.create(payment_data)
 
     @api.multi
     def compute_schedule(self):
-        for loan in self:
-            loan._compute_payment()
+        if self.is_computed:
+            msg = _('Schedule has already been computed')
+            raise UserError(msg)
+        else:
+            for loan in self:
+                loan._compute_payment()
+                self.is_computed = True
 
 
 class UnionRanchy(models.Model):
@@ -196,10 +243,10 @@ class UnionRanchy(models.Model):
                                                                 ('friday', 'Friday'), ], required=False, )
 
 
-class DisbursmentRanchy(models.Model):
-    _name = 'disbursment.ranchy'
+class DisbursementRanchy(models.Model):
+    _name = 'disbursement.ranchy'
     _rec_name = 'name'
-    _description = 'Disbursments'
+    _description = 'Disbursements'
 
     name = fields.Char()
 
@@ -274,11 +321,13 @@ class LoanType(models.Model):
     _description = 'New Description'
 
     name = fields.Char()
-    principal_amount = fields.Float(string="Principal Amount",  required=True, )
+    installment_period = fields.Selection(string="Installment Period", selection=[('weekly', 'Weekly'),
+                                                                                  ('monthly', 'Monthly'), ],
+                                          required=False, default='weekly' )
     service_rate = fields.Float(string="Service Rate", required=True, )
     admin_charge = fields.Float(string="Administrative Charge", required=True)
     risk_premium = fields.Float(string="Risk Premium", required=True)
-    no_installments = fields.Float(string="Number of Installments", required=True)
+    no_installments = fields.Integer(string="Number of Installments", required=True)
 
 
 class Savings(models.Model):

@@ -66,6 +66,7 @@
                   <header>
                       <button name="apply_loan" type="object" string="Apply for Loan" class="oe_highlight" states="draft"/>
                       <button name="approve_loan" type="object" string="Approve Loan" class="oe_highlight" states="applied"/>
+                      <button name="%(ranchyloans.collect_loan_fees_wizard)d" context="{'default_risk_premium': risk_premium_amount, 'default_loan_id': active_id, 'default_admin_charge': admin_charge}" type="action" string="Collect Premium" class="oe_highlight" states="approved"/>
                       <button name="disburse_loan" type="object" string="Disburse" class="oe_highlight" states="approved"/>
                       <button name="reject" type="object" string="Reject Loan" class="oe_highlight" states="applied"/>
                       <field name="state" widget="statusbar" statusbar_visible="draft,applied,approved,disbursed,paid"/>
@@ -74,6 +75,7 @@
                       <group>
                           <group>
                               <field name="type"/>
+                              <field name="stage_id"/>
                               <field name="app_date"/>
                               <field name="member_id"/>
                               <field name="group"/>
@@ -93,7 +95,8 @@
                               <field name="date_last"/>
                           </group>
                           <group>
-
+                              <field name="risk_premium_amount" widget="monetary"/>
+                              <field name="admin_charge" widget="monetary"/>
                               <field name="payment_amount" widget="monetary"/>
                               <field name="total_realised" widget="progressbar" options="{'current_value': 'total_realised', 'max_value': 'payment_amount', 'editable': false}"/>
                               <field name="balance_loan" widget="monetary"/>
@@ -218,7 +221,7 @@
           <field name="arch" type="xml">
               <tree string="Loan Type">
                   <field name="name"/>
-                  <field name="principal_amount"/>
+                  <field name="installment_period"/>
                   <field name="service_rate"/>
                   <field name="admin_charge"/>
                   <field name="risk_premium"/>
@@ -346,6 +349,16 @@
                   <field name="group"/>
                   <field name="amount"/>
                   <field name="state"/>
+              </tree>
+          </field>
+      </record>
+      <record id="loan_stages_tree" model="ir.ui.view">
+          <field name="name">loan.stages.tree</field>
+          <field name="model">loan.stages</field>
+          <field name="arch" type="xml">
+              <tree string="">
+                  <field name="name"/>
+                  <field name="principal_amount"/>
               </tree>
           </field>
       </record>

@@ -39,6 +39,19 @@
               </p>
             </field>
         </record>
+        <record id="loanstage_action" model="ir.actions.act_window">
+            <field name="name">Loan Stage</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">loan.stages</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
         <record id="union_action" model="ir.actions.act_window">
             <field name="name">Union</field>
             <field name="type">ir.actions.act_window</field>
@@ -129,6 +142,7 @@
         <menuitem id="scheduled_ranchy_menu" name="Scheduled Payments" parent="ranchy_collection_menu" action="scheduled_payments" sequence="5"/>
         <menuitem id="collected_ranchy_menu" name="Collected Payments" parent="ranchy_collection_menu" action="collected_payments" sequence="6"/>
         <menuitem id="withdraw_request_menu" name="Withdrawal Request" parent="ranchy_members_menu" action="withdraw_request_action" sequence="3"/>
+        <menuitem id="loanstage_ranchy_menu" name="Loan Stages" parent="ranchy_settings_menu" action="loanstage_action" sequence="2"/>
 
 
 
