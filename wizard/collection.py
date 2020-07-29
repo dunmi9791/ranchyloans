@@ -7,7 +7,8 @@ class CollectAmount(models.TransientModel):
     _name = 'collect.amount'
     _description = 'Collect Amount Wizard'
 
-    member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False, )
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="", related="loan_id.member_id", required=False, )
+    member_name = fields.Char(string="Member", related="member_id.name")
     group = fields.Many2one(string="Group/Union", related="member_id.group_id", readonly=True, )
     co_id = fields.Many2one(related="member_id.group_id.co_id", string="Credit Officer", readonly=True, )
     scheduled_amount = fields.Float(string="Scheduled Loan Amount", related="loan_id.installment_amount",  required=False, )

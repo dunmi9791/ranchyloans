@@ -14,14 +14,15 @@
                             <field string="Loans" name="loan_count" widget="statinfo"/>
                         </button>
                     </div>
+                   <field name="m_photo" widget="image" class="oe_avatar" />
                    <group>
                        <group>
-                           <field name="m_photo" widget="image" class="oe_avatar" options="{&quot;preview_image&quot;:&quot;image_medium&quot;}"/>
                            <field name="member_no"/>
                            <field name="first_name"/>
                            <field name="surname"/>
                        </group>
                        <group>
+                           <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                            <field name="group_id"/>
                            <field name="b_address"/>
                            <field name="balance"/>
@@ -79,6 +80,7 @@
                               <field name="app_date"/>
                               <field name="member_id"/>
                               <field name="group"/>
+                              <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                           </group>
                           <group>
                               <field name="avg_monthly"/>
@@ -107,7 +109,13 @@
                       <notebook>
                           <page string="Scheduled Installments">
                               <button name="compute_schedule" string="Compute Schedule" class="oe_highlight"  groups="" type="object"/>
-                              <field name="schedule_installments_ids"/>
+                              <field name="schedule_installments_ids">
+                                  <tree>
+                                     <field name="date"/>
+                                      <field name="installment"/>
+                                      <field name="state"/>
+                                  </tree>
+                              </field>
                           </page>
                           <page string="Payments">
                               <field name="payment_ids"/>
@@ -149,6 +157,7 @@
                           <group>
                               <field name="name"/>
                               <field name="description"/>
+                              <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                           </group>
                           <group>
                               <field name="co_id"/>
@@ -200,6 +209,7 @@
                   <field name="surname"/>
                   <field name="phone"/>
                   <field name="group_id"/>
+                  <field name="company_id" groups="base.group_multi_company" invisible="1"/>
 
               </tree>
           </field>
@@ -210,8 +220,10 @@
           <field name="arch" type="xml">
               <tree string="Scheduled Payments">
                   <field name="date"/>
+                  <field name="member_name"/>
                   <field name="installment"/>
                   <field name="state"/>
+                  <field name="company_id" groups="base.group_multi_company" invisible="1"/>
               </tree>
           </field>
       </record>
@@ -239,6 +251,7 @@
                   <field name="app_date"/>
                   <field name="amount_approved"/>
                   <field name="state"/>
+                  <field name="company_id" groups="base.group_multi_company" invisible="1"/>
               </tree>
           </field>
       </record>
@@ -264,9 +277,26 @@
                   <field name="collect_savings" widget="monetary"/>
                   <field name="collected_total" widget="monetary" sum="Total"/>
                   <field name="state"/>
+                  <field name="company_id" groups="base.group_multi_company" invisible="1"/>
 
               </tree>
           </field>
+      </record>
+      <record id="collected_search_view" model="ir.ui.view">
+         <field name="name">collected.search.view</field>
+         <field name="model">collection.ranchy</field>
+          <field name="arch" type="xml">
+              <search string="">
+            <field name="name" string="string" domain="[()]"/>
+                  <separator />
+                  <filter string="Today" name="today" domain="[('date',
+                  '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),('date',
+                   '&lt;=',datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
+                  <group expand="0" string="Group By">
+                    <filter string="Union" name="union" context="{'group_by':'group'}"/>
+                </group>
+          </search>
+         </field>
       </record>
       <record id="collected_form" model="ir.ui.view">
           <field name="name">collected.form</field>
@@ -280,6 +310,7 @@
                   <sheet>
                       <group>
                           <group>
+                              <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                               <field name="member"/>
                               <field name="loan_id"/>
                               <field name="collect_loan"/>
@@ -362,6 +393,108 @@
               </tree>
           </field>
       </record>
+<!--      <record id="scheduled_installments_view_search" model="ir.ui.view">-->
+<!--            <field name="name">scheduled.installments.search</field>-->
+<!--            <field name="model">schedule.installments</field>-->
+<!--            <field name="arch" type="xml">-->
+<!--                <search string="scheduled Installments">-->
+<!--                    <field name="name" string="string" domain="[()]"/>-->
+<!--                    <filter string="Today" domain="[('date', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),('date_field_from_model', '&lt;=',datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>-->
+<!--                    <separator/>-->
+<!--&lt;!&ndash;                    <filter name="lead" string="Leads" domain="[('lead_type','=', 'lead')]" help="Show only lead"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <filter name="opportunity" string="Opportunities" domain="[('lead_type','=','opportunity')]" help="Show only opportunity"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <separator/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <filter string="Won" name="won"&ndash;&gt;-->
+<!--&lt;!&ndash;                            domain="['&amp;', ('stage_id.probability', '=', 100), ('stage_id.on_change', '=', 1)]"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <separator/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <filter string="Date" name="filter_date" date="date"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <field name="team_id" context="{'invisible_team': False}"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <field name="author_id" string="Created By"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                    <group expand="1" string="Group By">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <filter string="Created By" name="group_by_salesperson" context="{'group_by':'author_id'}"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <filter string="Country" name="country" context="{'group_by':'country_id'}" />&ndash;&gt;-->
+<!--&lt;!&ndash;                        <filter string="Company" name="company" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <filter string="Stage" name="stage" context="{'group_by':'stage_id'}"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <filter string="Date" context="{'group_by':'date:month'}" name="month"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <filter string="Leads" name="group_by_opportunity" context="{'group_by':'lead_id'}" />&ndash;&gt;-->
+<!--&lt;!&ndash;                    </group>&ndash;&gt;-->
+<!--                </search>-->
+<!--            </field>-->
+<!--        </record>-->
+      <record id="scheduled_installments_view_search" model="ir.ui.view">
+         <field name="name">scheduled.installments.search</field>
+         <field name="model">schedule.installments</field>
+          <field name="arch" type="xml">
+              <search string="scheduled Installments">
+                    <field name="name" string="string" domain="[()]"/>
+                   <separator />
+                  <filter string="Today" name="today" domain="[('date',
+                  '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),('date',
+                   '&lt;=',datetime.datetime.now().strftime('%Y-%m-%d 23:59:59'))]"/>
+                  <group expand="0" string="Group By">
+                    <filter string="Union" name="union" context="{'group_by':'union'}"/>
+                </group>
+
+          </search>
+         </field>
+      </record>
+      <record id="collection_kanban" model="ir.ui.view">
+        <field name="name">schedule.collection.kanban</field>
+        <field name="model">schedule.installments</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="union">
+                <field name = "id" />
+                <field name="loan_id"/>
+                <field name="image"/>
+                <field name="union"/>
+                <field name="member_name"/>
+                <field name="member"/>
+                <field name="installment"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company" invisible="1"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill o_hospital_patient_kanban">
+                            <t t-if="record.image.raw_value">
+                                <div class="o_kanban_image_fill_left d-none d-md-block"
+                                     t-attf-style="background-image:url('#{kanban_image('schedule.installments', 'image', record.id.raw_value)}')"/>
+                            </t>
+                            <t t-else="">
+                                <img class="o_kanban_image" alt="Avatar" t-att-src='_s + "/base/static/img/avatar.png"'/>
+                            </t>
+                            <div class="oe_kanban_details">
+                                <strong class="o_kanban_record_title"><field name="installment"/></strong>
+                                <div class="o_kanban_tags_section"/>
+                                <ul>
+                                    <li>Member : <field name="member_name"/></li>
+                                    <li>Loan Id : <field name="loan_id"/></li>
+                                    <li>Payment Status : <field name="state"/></li>
+                                </ul>
+                                 <a type="button">
+                                <button name = "collect_repayment" type = "object" class = "oe_highlight">
+                                <span> Mark Paid </span>
+                                </button>
+                                </a>
+                                <a type="button">
+                                <button name = "%(ranchyloans.collect_amount_wizard)d"
+                                        type = "action" class = "oe_highlight" context="{'default_loan_id' : loan_id.id}">
+                                <span> Collect  Saving </span>
+                                </button>
+                                </a>
+                            </div>
+
+                        </div>
+                    </t>
+                    <searchpanel>
+                        <field name="loan_id" icon="fa-building"/>
+                        <field name="loan_id" select="multi" icon="fa-tags"/>
+                    </searchpanel>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
 
   </data>
 </odoo>

@@ -11,12 +11,13 @@
                     <group>
                     <field name="member_id"/>
                     <field name="loan_id"  domain="[('state','=','disbursed')]"/>
-                    <field name="collected_amount" widget="monetary"/>
+                    <field name="collected_amount" widget="monetary" options='{"type": "float", "step": 1}'/>
                         <field name="collected_savings" widget="monetary"/>
-                        <field name="no_installments"/>
+                        <field name="no_installments" options='{"type": "number", "step": 1}'/>
                         <field name="linked_schedule_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
                     </group>
                     <group>
+                        <field name="member_name"/>
                          <field name="group"/>
                         <field name="co_id"/>
                         <field name="scheduled_amount"/>

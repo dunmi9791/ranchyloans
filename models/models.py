@@ -69,6 +69,7 @@ class LoansRanchy(models.Model):
     admin_charge = fields.Float(string="Administrative Charge", related="type.admin_charge", readonly=True,)
     risk_premium_amount = fields.Float(string="Risk Premium", compute='_risk_premium',)
     fee_paid = fields.Boolean(string="Fees Paid")
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True, default=lambda self: self.env.user.company_id)
 
     @api.one
     @api.depends('amount_approved')
@@ -241,6 +242,8 @@ class UnionRanchy(models.Model):
     union_day = fields.Selection(string="Union Day", selection=[('monday', 'Monday'), ('tuesday', 'Tuesday'),
                                                                 ('wednesday', 'Wednesday'), ('thursday', 'Thursday'),
                                                                 ('friday', 'Friday'), ], required=False, )
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
 
 
 class DisbursementRanchy(models.Model):
@@ -257,7 +260,7 @@ class MembersRanchy(models.Model):
     _description = 'members'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char()
+    name = fields.Char(string="Name", compute="fullname", required=False)
     first_name = fields.Char(string="First Name", required=False, track_visibility=True, trace_visibility='onchange', )
     surname = fields.Char(string="Surname", required=False, track_visibility=True, trace_visibility='onchange', )
     r_address = fields.Char(string="Residential Address", required=False, track_visibility=True, trace_visibility='onchange', )
@@ -274,7 +277,7 @@ class MembersRanchy(models.Model):
     nok = fields.Char(string="next of Kin", required=False, track_visibility=True, trace_visibility='onchange',)
     nok_phone = fields.Char(string="NOK Phone", required=False, track_visibility=True, trace_visibility='onchange',)
     group_id = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", required=False, track_visibility=True, trace_visibility='onchange', )
-    m_photo = fields.Binary(string="", track_visibility=True, trace_visibility='onchange', )
+    m_photo = fields.Binary(string="", track_visibility=True, trace_visibility='onchange', attachment=True, readonly=False, )
     saving_ids = fields.One2many(comodel_name="savings.ranchy", inverse_name="member_id", string="Savings", required=False, )
     withdrawal_ids = fields.One2many(comodel_name="withdrawals.ranchy", inverse_name="member_id", string="Withdrawals",
                                  required=False, )
@@ -289,6 +292,14 @@ class MembersRanchy(models.Model):
                             requires=False, readonly=True, trace_visibility='onchange', )
     active_loan = fields.Many2one(comodel_name="loans.ranchy", inverse_name="member_id", string="Loans",
                                  required=False,)
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
+
+    @api.one
+    @api.depends('first_name', 'surname')
+    def fullname(self):
+        for record in self:
+            record['name'] = (record.first_name or '') + ' ' + (record.surname or '')
 
     @api.model
     def create(self, vals):
@@ -354,7 +365,7 @@ class Withdrawals(models.Model):
 
 class ScheduleInstallments(models.Model):
     _name = 'schedule.installments'
-    _rec_name = 'installment'
+    _rec_name = 'date'
     _description = 'New Description'
 
     name = fields.Char()
@@ -363,6 +374,14 @@ class ScheduleInstallments(models.Model):
     installment = fields.Float(string="Installment Amount",  required=False, )
     state = fields.Selection(string="State", selection=[('paid', 'Paid'), ('unpaid', 'Unpaid'), ],
                              required=False, default='unpaid')
+    member = fields.Many2one(comodel_name="members.ranchy", string="Member", related="loan_id.member_id", store=True)
+    union = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", related="member.group_id", store=True)
+    image = fields.Binary(string="Photo", related="member.m_photo")
+    collected = fields.Boolean(string="",  )
+    default = fields.Boolean(string="",)
+    member_name = fields.Char(string="Name", related="member.name")
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
 
     @api.multi
     def is_allowed_transition(self, old_state, new_state):
@@ -384,6 +403,22 @@ class ScheduleInstallments(models.Model):
     def apply_paid(self):
         self.change_state('paid')
 
+    def collect_repayment(self):
+        self.ensure_one()
+        return {
+            'view_type': 'form',
+            'view_mode': 'form',
+            'res_model': 'collect.amount',
+            'view_id': self.env.ref('ranchyloans.collect_repayment_form').id,
+            'type': 'ir.actions.act_window',
+            'context': {
+                'default_loan_id': self.loan_id.id,
+
+
+            },
+            'target': 'new'
+        }
+
 
 class LoanPayments(models.Model):
     _name = 'payments.ranchy'
@@ -403,7 +438,7 @@ class CollectionRanchy(models.Model):
 
     name = fields.Char()
     member = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
-    group = fields.Many2one(string="Group/Union", related="member.group_id", readonly=True,)
+    group = fields.Many2one(string="Group/Union", related="member.group_id", readonly=True, store=True)
     scheduled = fields.Float(string="Expected Installment", related="loan_id.installment_amount")
     loan_id = fields.Many2one(string="Active Loan", comodel_name="loans.ranchy")
     collect_loan = fields.Integer(string="Collected Loan amount", )
@@ -415,6 +450,8 @@ class CollectionRanchy(models.Model):
     collected_by = fields.Many2one('res.users', 'Collected By', default=lambda self: self.env.user)
     collected_total = fields.Integer(string="Total Collected", compute="_total_collected",)
     date = fields.Date(string="Date", required=False, default=date.today())
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
 
 
 
@@ -473,6 +510,44 @@ class CollectionRanchy(models.Model):
     def schedule(self):
         sch = self.env['schedule.installments'].apply_paid
         return sch
+
+    def _daily(self):
+        """
+        @api.depends() should contain all fields that will be used in the calculations.
+        """
+        today = 300000
+        yesterday = 25000
+        result = {"value": today, "previous": yesterday}
+        return result
+
+    @api.one
+    @api.depends('')
+    def _daily_collection(self):
+        """
+        @api.depends() should contain all fields that will be used in the calculations.
+        """
+        number = 60
+        return number
+
+
+class Kpi(models.Model):
+    _inherit = 'kpi.kpi'
+
+    @api.multi
+    def _daily_collection(self):
+        """
+        @api.depends() should contain all fields that will be used in the calculations.
+        """
+        number = 60
+        return number
+
+    @api.multi
+    def _daily(self):
+        """
+        @api.depends() should contain all fields that will be used in the calculations.
+        """
+        number = 300000
+        return number
 
 
 

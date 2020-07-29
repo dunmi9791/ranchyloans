@@ -1,0 +1,33 @@
+<odoo>
+    <record id="members_company_rule" model="ir.rule">
+        <field name="name">Members multi-company</field>
+        <field name="model_id" ref="model_members_ranchy"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
+    <record id="loans_company_rule" model="ir.rule">
+        <field name="name">Loans multi-company</field>
+        <field name="model_id" ref="model_loans_ranchy"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
+    <record id="unions_company_rule" model="ir.rule">
+        <field name="name">Unions multi-company</field>
+        <field name="model_id" ref="model_union_ranchy"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
+    <record id="installments_company_rule" model="ir.rule">
+        <field name="name">Installments multi-company</field>
+        <field name="model_id" ref="model_schedule_installments"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
+    <record id="collections_company_rule" model="ir.rule">
+        <field name="name">Collections multi-company</field>
+        <field name="model_id" ref="model_collection_ranchy"/>
+        <field name="global" eval="True"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
+
+</odoo>

@@ -25,6 +25,7 @@
     'data': [
         'wizard/collection.xml',
         'security/ir.model.access.csv',
+        'security/record_rules.xml',
         'views/menus.xml',
         'views/views.xml',
         'data/subtypes.xml',
