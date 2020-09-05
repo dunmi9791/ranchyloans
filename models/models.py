@@ -60,8 +60,8 @@ class LoansRanchy(models.Model):
     payment_amount = fields.Float(string="Repayment Amount", compute='_repay_amount')
     installment_amount = fields.Float(string="Installment Amount", compute='_installment_amount')
     total_realisable = fields.Integer(string="Expected Realisation", compute='_total_realisable')
-    total_realised = fields.Integer(string="Realised Total", compute='_total_realised')
-    balance_loan = fields.Integer(string="Loan Balance", compute='_loan_balance', )
+    total_realised = fields.Integer(string="Realised Total", compute='_total_realised', store=True)
+    balance_loan = fields.Integer(string="Loan Balance", compute='_loan_balance', store=True )
     is_computed = fields.Boolean(string="Computed",  )
     interest_rate = fields.Float(string="Interest Rate", related="type.service_rate", readonly=True,)
     stage_id = fields.Many2one(comodel_name="loan.stages", string="Loan Stage", required=False, )
@@ -83,7 +83,7 @@ class LoansRanchy(models.Model):
         self.total_realisable = sum(schedule.installment for schedule in self.schedule_installments_ids)
 
     @api.one
-    @api.depends('schedule_installments_ids.installment', )
+    @api.depends('schedule_installments_ids.state', )
     def _total_realised(self):
 
         self.total_realised = sum(paid.installment
@@ -105,7 +105,7 @@ class LoansRanchy(models.Model):
         self.installment_amount = self.payment_amount / self.no_install
 
     @api.one
-    @api.depends('payment_amount')
+    @api.depends('total_realised')
     def _loan_balance(self):
         self.balance_loan = self.payment_amount - self.total_realised
 
@@ -227,6 +227,12 @@ class LoansRanchy(models.Model):
                 loan._compute_payment()
                 self.is_computed = True
 
+    @api.multi
+    def write(self, values):
+        if self.balance_loan in values and self.balance_loan == 0:
+            self.change_state('paid')
+        return super(LoansRanchy, self).write(values)
+
 
 class UnionRanchy(models.Model):
     _name = 'union.ranchy'
@@ -284,7 +290,8 @@ class MembersRanchy(models.Model):
     loan_ids = fields.One2many(comodel_name="loans.ranchy", inverse_name="member_id", string="Loans",
                                  required=False, )
     active = fields.Boolean(string="Active", default=True)
-    loan_count = fields.Integer(string="Loans", compute= 'get_loan_count', )
+    loan_count = fields.Integer(string="Loans", compute='get_loan_count', )
+    collection_count = fields.Integer(string="Loans", compute='get_collection_count', )
     saving_total = fields.Float(string="saving total", compute='_saving_total')
     withdrawal_total = fields.Float(string="withdrawal total", compute='_withdrawal_total')
     balance = fields.Float(string="Savings Balance", compute='_balance')
@@ -292,6 +299,7 @@ class MembersRanchy(models.Model):
                             requires=False, readonly=True, trace_visibility='onchange', )
     active_loan = fields.Many2one(comodel_name="loans.ranchy", inverse_name="member_id", string="Loans",
                                  required=False,)
+    collection_ids = fields.One2many(comodel_name="collection.ranchy", inverse_name="member", string="Collections")
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
 
@@ -311,6 +319,10 @@ class MembersRanchy(models.Model):
     def get_loan_count(self):
         count = self.env['loans.ranchy'].search_count([('member_id', '=', self.id)])
         self.loan_count = count
+
+    def get_collection_count(self):
+        count = self.env['collection.ranchy'].search_count([('member', '=', self.id)])
+        self.collection_count = count
 
     @api.one
     @api.depends('saving_ids.amount', )
@@ -355,18 +367,19 @@ class Savings(models.Model):
 class Withdrawals(models.Model):
     _name = 'withdrawals.ranchy'
     _rec_name = 'name'
-    _description = 'New Description'
+    _description = 'withdrawals'
 
     name = fields.Char()
     member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
     date = fields.Date(string="Date", required=False, )
     amount = fields.Float(string="Amount", required=False, )
+    description = fields.Char(string="Description", required=False, )
 
 
 class ScheduleInstallments(models.Model):
     _name = 'schedule.installments'
     _rec_name = 'date'
-    _description = 'New Description'
+    _description = 'installments'
 
     name = fields.Char()
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan", required=False, )
@@ -382,10 +395,14 @@ class ScheduleInstallments(models.Model):
     member_name = fields.Char(string="Name", related="member.name")
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
+    collection_id = fields.Many2one('collection.ranchy', invisible=1)
+    collection_loan = fields.Integer(string="Collection (Loan)",)
+    collection_savings = fields.Integer(string="Collection(Savings)",)
 
     @api.multi
     def is_allowed_transition(self, old_state, new_state):
         allowed = [('unpaid', 'paid'),
+                   ('paid', 'paid'),
 
                    ]
         return (old_state, new_state) in allowed
@@ -419,11 +436,26 @@ class ScheduleInstallments(models.Model):
             'target': 'new'
         }
 
+    @api.multi
+    def mark_paid(self):
+        collection = self.env['collection.ranchy'].create({
+                'member': self.member.id,
+                'loan_id': self.loan_id.id,
+                'collect_loan': self.installment,
+                'no_installments': 1,
+                'linked_installments_ids': [(6, 0, self.ids)],
+                'state': 'collected',
+                'date': date.today(),
+            })
+        self.collection_id = collection
+
+        self.change_state('paid')
+
 
 class LoanPayments(models.Model):
     _name = 'payments.ranchy'
     _rec_name = 'name'
-    _description = 'New Description'
+    _description = 'Payments'
 
     name = fields.Char()
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan", required=False, )
@@ -448,13 +480,27 @@ class CollectionRanchy(models.Model):
     state = fields.Selection(string="", selection=[('draft', 'Draft'), ('collected', 'Collected'),
                                                    ('confirmed', 'Confirmed'), ], required=False, )
     collected_by = fields.Many2one('res.users', 'Collected By', default=lambda self: self.env.user)
-    collected_total = fields.Integer(string="Total Collected", compute="_total_collected",)
+    collected_total = fields.Integer(string="Total Collected", compute="_total_collected", store=True)
     date = fields.Date(string="Date", required=False, default=date.today())
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
+    description = fields.Char(string="Description", required=False, )
+    # savings_balance = fields.Float(string="Saving Balance", related="member.balance", store=True)
+    # loan_balance = fields.Integer(string="Loan Balance", related="loan_id.balance_loan", store=True)
+    # journal_id = fields.Many2one('account.journal', string='Journal', required=True,
+    #                              states={'confirm': [('readonly', True)]}, default=_default_journal)
 
+    @api.onchange('member')
+    def _onchange_member_id(self):
+        if self.member:
+            loan_ids = self.member.loan_ids.ids
+            return {'domain': {'loan_id': [('id', 'in', loan_ids), ('state', '=', 'disbursed')]}}
 
-
+    @api.onchange('loan_id')
+    def _onchange_loan_id(self):
+        if self.loan_id:
+            schedule_ids = self.loan_id.schedule_installments_ids.ids
+            return {'domain': {'linked_installments_ids': [('id', 'in', schedule_ids), ('state', '=', 'unpaid')]}}
 
     @api.one
     @api.depends('collect_loan', 'collect_savings')
@@ -465,7 +511,10 @@ class CollectionRanchy(models.Model):
     @api.one
     @api.depends('collect_loan')
     def _no_installment(self):
-        self.no_installments = self.collect_loan / self.scheduled
+        if self.collect_loan:
+            self.no_installments = self.collect_loan / self.scheduled
+        else:
+            pass
 
     @api.multi
     def is_allowed_transition(self, old_state, new_state):
@@ -501,10 +550,10 @@ class CollectionRanchy(models.Model):
         }
         loan_repayment.create(values)
         schedule = self.env['schedule.installments']
-        install_id = self.linked_installments_ids.id
+        install_id = self.linked_installments_ids.ids
         install = schedule.browse(install_id)
 
-        install.apply_paid()
+        install.sudo().apply_paid()
         self.change_state('confirmed')
 
     def schedule(self):

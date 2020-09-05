@@ -13,6 +13,9 @@
                        <button name="%(open_member_loans)d" class="oe_stat_button" type="action" icon="fa-usd">
                             <field string="Loans" name="loan_count" widget="statinfo"/>
                         </button>
+                       <button name="%(open_member_collections)d" class="oe_stat_button" type="action" icon="fa-usd">
+                            <field string="Collections" name="collection_count" widget="statinfo"/>
+                        </button>
                     </div>
                    <field name="m_photo" widget="image" class="oe_avatar" />
                    <group>
@@ -218,11 +221,13 @@
           <field name="name">schedule.payment.tree</field>
           <field name="model">schedule.installments</field>
           <field name="arch" type="xml">
-              <tree string="Scheduled Payments">
-                  <field name="date"/>
-                  <field name="member_name"/>
-                  <field name="installment"/>
-                  <field name="state"/>
+              <tree string="Scheduled Payments" editable="bottom">
+                  <field name="date" readonly="1"/>
+                  <field name="member_name" readonly="1"/>
+                  <field name="installment" readonly="1"/>
+                  <field name="state" readonly="1"/>
+                  <field name="collection_loan" sum="Total Collected"/>
+                  <field name="collection_savings" sum="Total Collected"/>
                   <field name="company_id" groups="base.group_multi_company" invisible="1"/>
               </tree>
           </field>
@@ -393,6 +398,21 @@
               </tree>
           </field>
       </record>
+      <record id="post_collection_view" model="ir.ui.view">
+            <field name="name">post.collection.form</field>
+            <field name="model">post.collection</field>
+            <field name="arch" type="xml">
+                <form string="Post Collections">
+                    <p class="oe_grey">
+                        Post collection with the button
+                    </p>
+                    <footer>
+                        <button string="Post Collections" name="post_collection" type="object" default_focus="1" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
 <!--      <record id="scheduled_installments_view_search" model="ir.ui.view">-->
 <!--            <field name="name">scheduled.installments.search</field>-->
 <!--            <field name="model">schedule.installments</field>-->
@@ -472,14 +492,14 @@
                                     <li>Payment Status : <field name="state"/></li>
                                 </ul>
                                  <a type="button">
-                                <button name = "collect_repayment" type = "object" class = "oe_highlight">
-                                <span> Mark Paid </span>
+                                <button name = "collect_repayment" type = "object" class = "oe_highlight" states="unpaid">
+                                <span> Enter Payment </span>
                                 </button>
                                 </a>
                                 <a type="button">
-                                <button name = "%(ranchyloans.collect_amount_wizard)d"
-                                        type = "action" class = "oe_highlight" context="{'default_loan_id' : loan_id.id}">
-                                <span> Collect  Saving </span>
+                                <button name = "mark_paid"
+                                        type = "object" class = "oe_highlight" states="unpaid">
+                                <span> Mark Paid </span>
                                 </button>
                                 </a>
                             </div>
@@ -494,6 +514,16 @@
             </kanban>
         </field>
     </record>
+      <record model="ir.ui.view" id="collected_payments_graph">
+            <field name="name">collected.payments.graph</field>
+            <field name="model">collection.ranchy</field>
+            <field name="arch" type="xml">
+                <graph string="Collected Payments">
+                    <field name="group"/>
+
+                </graph>
+            </field>
+        </record>
 
 
   </data>

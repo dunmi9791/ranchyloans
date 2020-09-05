@@ -84,3 +84,35 @@ class LoanStages(models.Model):
     principal_amount = fields.Float(string="Principal Amount",  required=False, )
 
 
+class LapseAdjustment(models.Model):
+    _name = 'lapse.adjustment'
+    _rec_name = 'name'
+    _description = 'Lapse Table'
+
+    name = fields.Char()
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False, )
+    loan_id = fields.Many2one(string="Loan", comodel_name="loans.ranchy")
+    amount = fields.Float(string="Adjustment Amount", required=False, )
+    date = fields.Date(string="Date", required=False, )
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
+
+
+class PostCollection(models.TransientModel):
+    """
+    This wizard will flag expense request to attend to later
+    """
+
+    _name = "post.collection"
+    _description = "Flag selected expense request"
+
+    @api.multi
+    def expense_flag(self):
+        context = dict(self._context or {})
+        active_ids = context.get('active_ids', []) or []
+
+        for record in self.env['expense.rider'].browse(active_ids):
+            record.flag = True
+
+        return {'type': 'ir.actions.act_window_close'}
+

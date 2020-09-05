@@ -1,5 +1,11 @@
 <odoo>
     <data>
+        <act_window id="action_post_collection"
+            multi="True"
+            key2="client_action_multi" name="Post Collections"
+            res_model="post.collection" src_model="schedule.installments"
+            view_mode="form" target="new" view_type="form" />
+
         <record id="members_action" model="ir.actions.act_window">
             <field name="name">Members</field>
             <field name="type">ir.actions.act_window</field>
@@ -78,6 +84,19 @@
           </p>
         </field>
     </record>
+        <record id="open_member_collections" model="ir.actions.act_window">
+        <field name="name">Collections</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">collection.ranchy</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('member','=',active_id)]</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+
+          </p>
+        </field>
+    </record>
         <record id="scheduled_payments" model="ir.actions.act_window">
             <field name="name">Scheduled Payments</field>
             <field name="type">ir.actions.act_window</field>
@@ -96,7 +115,7 @@
             <field name="name">Collected Payments</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">collection.ranchy</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree,form,pivot,graph</field>
             <field name="help" type="html">
               <p class="oe_view_nocontent_create">
                 <!-- Add Text Here -->
@@ -120,7 +139,7 @@
         </record>
 
 
-        <menuitem name="Ranchy Loans" id="ranchy_loans_root_menu" web_icon="ranchyloans,static/src/img/icon.png"/>
+        <menuitem name="Ranchi Loans" id="ranchy_loans_root_menu" web_icon="ranchyloans,static/src/img/icon.png"/>
         <menuitem name="Members" id="ranchy_members_menu" parent="ranchy_loans_root_menu"
               sequence="2" />
         <!-- This Menu Item Must have a parent -->

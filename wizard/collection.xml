@@ -106,12 +106,19 @@
          <field name="arch" type="xml">
             <form string="Lapse Adjustment">
                 <group>
-                    <field name="member_id"/>
-                    <field name="group"/>
-                    <field name="co_id"/>
-                    <field name="amount"/>
-                    <field name="balance"/>
-                    <field name="loan_balance"/>
+                    <group>
+                        <field name="member_id"/>
+                        <field name="group"/>
+                        <field name="co_id"/>
+                        <field name="amount"/>
+                    </group>
+                    <group>
+                        <field name="loan_id"/>
+                        <field name="balance"/>
+                        <field name="loan_balance"/>
+                        <field name="difference"/>
+                        <field name="linked_schedule_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                    </group>
                 </group>
                 <footer>
 
