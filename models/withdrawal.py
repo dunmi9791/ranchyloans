@@ -104,15 +104,30 @@ class PostCollection(models.TransientModel):
     """
 
     _name = "post.collection"
-    _description = "Flag selected expense request"
+    _description = "Post Collections "
 
     @api.multi
-    def expense_flag(self):
+    def post_collection(self):
         context = dict(self._context or {})
         active_ids = context.get('active_ids', []) or []
 
-        for record in self.env['expense.rider'].browse(active_ids):
-            record.flag = True
+        for record in self.env['schedule.installments'].browse(active_ids):
+            if record.state == 'unpaid':
+                collection = self.env['collection.ranchy']
+                vals = {
+                    'member': record.member.id,
+                    'loan_id': record.loan_id.id,
+                    'collect_loan': record.collection_loan,
+                    'collect_savings': record.collection_savings,
+                    'no_installments': record.no_installments,
+                    # 'linked_installments_ids': [(6, 0, record.linked_schedule_ids.ids)],
+                    'state': 'collected',
+                    'date': date.today(),
+                }
+                collection.create(vals)
+                record.change_state('paid')
+            else:
+                pass
 
         return {'type': 'ir.actions.act_window_close'}
 

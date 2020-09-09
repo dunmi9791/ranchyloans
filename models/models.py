@@ -398,6 +398,13 @@ class ScheduleInstallments(models.Model):
     collection_id = fields.Many2one('collection.ranchy', invisible=1)
     collection_loan = fields.Integer(string="Collection (Loan)",)
     collection_savings = fields.Integer(string="Collection(Savings)",)
+    no_installments = fields.Integer(string="Number of Installments Paid", required=False, default=1, )
+
+    @api.onchange('loan_id')
+    def _onchange_loan_id(self):
+        if self.loan_id:
+            schedule_ids = self.loan_id.schedule_installments_ids.ids
+            return {'domain': {'linked_schedule_ids': [('id', 'in', schedule_ids), ('state', '=', 'unpaid')]}}
 
     @api.multi
     def is_allowed_transition(self, old_state, new_state):

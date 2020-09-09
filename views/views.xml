@@ -228,6 +228,7 @@
                   <field name="state" readonly="1"/>
                   <field name="collection_loan" sum="Total Collected"/>
                   <field name="collection_savings" sum="Total Collected"/>
+                  <field name="no_installments"/>
                   <field name="company_id" groups="base.group_multi_company" invisible="1"/>
               </tree>
           </field>
