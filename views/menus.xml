@@ -137,6 +137,19 @@
               </p>
             </field>
         </record>
+        <record id="collected_fees_action" model="ir.actions.act_window">
+            <field name="name">Collected fees</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">fees.collection</field>
+            <field name="view_mode">tree</field>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
 
 
         <menuitem name="Ranchi Loans" id="ranchy_loans_root_menu" web_icon="ranchyloans,static/src/img/icon.png"/>
@@ -163,6 +176,7 @@
         <menuitem id="collected_ranchy_menu" name="Collected Payments" parent="ranchy_collection_menu" action="collected_payments" sequence="6"/>
         <menuitem id="withdraw_request_menu" name="Withdrawal Request" parent="ranchy_members_menu" action="withdraw_request_action" sequence="3"/>
         <menuitem id="loanstage_ranchy_menu" name="Loan Stages" parent="ranchy_settings_menu" action="loanstage_action" sequence="2"/>
+        <menuitem id="feescollection_ranchy_menu" name="Collected fees" parent="ranchy_collection_menu" action="collected_fees_action" sequence="7"/>
 
 
 

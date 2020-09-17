@@ -11,3 +11,5 @@ access_ranchy_loans9,ranchy_payments,model_payments_ranchy,,1,1,1,1
 access_ranchy_loans10,ranchy_payments,model_collection_ranchy,,1,1,1,1
 access_ranchy_loans11,ranchy_withdrawr,model_withdraw_request,,1,1,1,1
 access_ranchy_loans12,ranchy_loanstage,model_loan_stages,,1,1,1,1
+access_ranchy_loans13,ranchy_feescollection,model_fees_collection,,1,1,1,1
+access_ranchy_loans14,ranchy_loandisburse,model_disbursements_ranchi,,1,1,1,1

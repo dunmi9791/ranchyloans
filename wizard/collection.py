@@ -160,16 +160,53 @@ class CollectFees(models.TransientModel):
     _description = 'Collect Loan Fees Wizard'
 
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="", required=False, )
-    date = fields.Date(string="Date", required=False, )
+    date = fields.Date(string="Date", required=False, default=date.today())
     risk_premium = fields.Float(string="Risk Premium",  required=False, )
     amount = fields.Float(string="Collected Amount",  required=False, )
     admin_charge = fields.Float(string="Administrative Charge")
 
-    @api.one
-    @api.depends('amount')
+    @api.constrains('amount')
+    def check_amount(self):
+        for rec in self:
+            if rec.amount != rec.risk_premium + rec.admin_charge:
+                raise UserError(_("Amount collected must be equal to Risk Premium plus Admin Charge."))
+
     def collect_fees(self):
-        """
-        @api.depends() should contain all fields that will be used in the calculations.
-        """
-        pass
+        collection = self.env['fees.collection']
+        vals = {
+            'amount': self.amount,
+            'loan_id': self.loan_id.id,
+            'risk_premium': self.risk_premium,
+            'admin_charge': self.admin_charge,
+
+        }
+        collection.create(vals)
+        self.loan_id.fees_collected = True
+
+
+class DisburseWiz(models.TransientModel):
+    _name = 'disburse.wiz'
+    _rec_name = 'name'
+    _description = 'Disbursement Wizard'
+
+    name = fields.Char()
+    loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan")
+    disbursed_amount = fields.Float(string="Disbursed Amount", required=False, related="loan_id.amount_approved")
+    mode = fields.Selection(string="Mode of Disburse", selection=[('cash', 'Cash'), ('cheque', 'Cheque'),
+                                                                  ('transfer', 'Transfer')], required=False, )
+    mode_ref = fields.Char(string="Cheque / Ref", required=False, )
+    date = fields.Date(string="Date", required=False, default=date.today())
+
+    def disburse_loan(self):
+        disbursement = self.env['disbursements.ranchi']
+        vals = {
+            'mode_ref': self.mode_ref,
+            'loan_id': self.loan_id.id,
+            'disbursed_amount': self.disbursed_amount,
+            'mode': self.mode,
+
+        }
+        disbursement.create(vals)
+        self.loan_id.change_state('disbursed')
+
 

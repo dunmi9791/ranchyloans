@@ -71,7 +71,7 @@
                       <button name="apply_loan" type="object" string="Apply for Loan" class="oe_highlight" states="draft"/>
                       <button name="approve_loan" type="object" string="Approve Loan" class="oe_highlight" states="applied"/>
                       <button name="%(ranchyloans.collect_loan_fees_wizard)d" context="{'default_risk_premium': risk_premium_amount, 'default_loan_id': active_id, 'default_admin_charge': admin_charge}" type="action" string="Collect Premium" class="oe_highlight" states="approved"/>
-                      <button name="disburse_loan" type="object" string="Disburse" class="oe_highlight" states="approved"/>
+                      <button name="%(ranchyloans.disburse_loan_wizard)d" context="{'default_loan_id': active_id,}" type="action" string="Disburse" class="oe_highlight" states="approved"/>
                       <button name="reject" type="object" string="Reject Loan" class="oe_highlight" states="applied"/>
                       <field name="state" widget="statusbar" statusbar_visible="draft,applied,approved,disbursed,paid"/>
                   </header>
@@ -525,6 +525,21 @@
                 </graph>
             </field>
         </record>
+      <record id="fees_collection_tree" model="ir.ui.view">
+          <field name="name">fees.collection.tree</field>
+          <field name="model">fees.collection</field>
+          <field name="arch" type="xml">
+              <tree string="Fees collected">
+                  <field name="date"/>
+                  <field name="member_id"/>
+                  <field name="loan_id"/>
+                  <field name="risk_premium"/>
+                  <field name="admin_charge"/>
+                  <field name="amount"/>
+                  <field name="state"/>
+              </tree>
+          </field>
+      </record>
 
 
   </data>

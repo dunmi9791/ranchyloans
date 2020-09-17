@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import models, fields, api
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 from odoo.tools.translate import _
 from dateutil import relativedelta
 from datetime import datetime
@@ -70,6 +70,7 @@ class LoansRanchy(models.Model):
     risk_premium_amount = fields.Float(string="Risk Premium", compute='_risk_premium',)
     fee_paid = fields.Boolean(string="Fees Paid")
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True, default=lambda self: self.env.user.company_id)
+    fees_collected = fields.Boolean(string="",  )
 
     @api.one
     @api.depends('amount_approved')
@@ -95,7 +96,7 @@ class LoansRanchy(models.Model):
         self.interest = self.amount_approved * (self.interest_rate / 100)
 
     @api.one
-    @api.depends('interest')
+    @api.depends('interest', 'amount_approved')
     def _repay_amount(self):
         self.payment_amount = self.amount_approved + self.interest
 
@@ -105,7 +106,7 @@ class LoansRanchy(models.Model):
         self.installment_amount = self.payment_amount / self.no_install
 
     @api.one
-    @api.depends('total_realised')
+    @api.depends('total_realised', 'payment_amount')
     def _loan_balance(self):
         self.balance_loan = self.payment_amount - self.total_realised
 
@@ -135,11 +136,17 @@ class LoansRanchy(models.Model):
 
     @api.multi
     def approve_loan(self):
-        self.change_state('approved')
+        for loan in self:
+            loan.compute_schedule()
+            self.change_state('approved')
 
     @api.multi
     def disburse_loan(self):
-        self.change_state('disbursed')
+        if self.fees_collected:
+            self.change_state('disbursed')
+        else:
+            raise ValidationError(
+                _('Collect and Enter Risk Premium and admin Charges first'))
 
     @api.multi
     def reject(self):
@@ -380,6 +387,7 @@ class ScheduleInstallments(models.Model):
     _name = 'schedule.installments'
     _rec_name = 'date'
     _description = 'installments'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan", required=False, )
@@ -474,6 +482,7 @@ class CollectionRanchy(models.Model):
     _name = 'collection.ranchy'
     _rec_name = 'member'
     _description = 'table of collections'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
     member = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
@@ -604,6 +613,7 @@ class Kpi(models.Model):
         """
         number = 300000
         return number
+
 
 
 

@@ -92,12 +92,40 @@
             </form>
          </field>
      </record>
+    <record id="disburse_loan_form" model="ir.ui.view">
+         <field name="name">disburse.loan.wizard</field>
+         <field name="model">disburse.wiz</field>
+         <field name="arch" type="xml">
+            <form string="Collect Loan Fees">
+                <group>
+                    <field name="loan_id"/>
+                    <field name="date"/>
+                    <field name="disbursed_amount" widget="monetary"/>
+                    <field name="mode"/>
+                    <field name="mode_ref" attrs="{'required':[('mode','in', ('cheque', 'transfer'))]}" />
+                </group>
+                <footer>
+
+                    <button name="disburse_loan" string="Disburse" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+         </field>
+     </record>
     <record id="collect_loan_fees_wizard" model="ir.actions.act_window">
         <field name="name">Collect Fees</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">collect.fees</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="collect_loan_fees_form"/>
+        <field name="target">new</field>
+    </record>
+    <record id="disburse_loan_wizard" model="ir.actions.act_window">
+        <field name="name">Disburse Loan</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">disburse.wiz</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="disburse_loan_form"/>
         <field name="target">new</field>
     </record>
     <record id="lapse_adjustment_form" model="ir.ui.view">

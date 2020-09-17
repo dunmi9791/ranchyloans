@@ -88,6 +88,7 @@ class LapseAdjustment(models.Model):
     _name = 'lapse.adjustment'
     _rec_name = 'name'
     _description = 'Lapse Table'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
     member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False, )
@@ -130,4 +131,65 @@ class PostCollection(models.TransientModel):
                 pass
 
         return {'type': 'ir.actions.act_window_close'}
+
+
+class FeesCollection(models.Model):
+    _name = 'fees.collection'
+    _rec_name = 'name'
+    _description = 'Fees collection'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
+    name = fields.Char()
+    loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan Id", required=False, )
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", related="loan_id.member_id")
+    date = fields.Date(string="Date", required=False, default=date.today())
+    risk_premium = fields.Float(string="Risk Premium", required=False, )
+    amount = fields.Float(string="Total", required=False, )
+    admin_charge = fields.Float(string="Administrative Charge")
+    state = fields.Selection(string="Status", selection=[('collected', 'Collected'), ('posted', 'Posted'), ],
+                             required=False, default='collected')
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
+
+    @api.multi
+    def is_allowed_transition(self, old_state, new_state):
+        allowed = [('collected', 'posted'),
+
+                   ]
+        return (old_state, new_state) in allowed
+
+    @api.multi
+    def change_state(self, new_state):
+        for collection in self:
+            if collection.is_allowed_transition(collection.state, new_state):
+                collection.state = new_state
+            else:
+                msg = _('Moving from %s to %s is not allowed') % (collection.state, new_state)
+                raise UserError(msg)
+
+    @api.multi
+    def post_collection(self):
+        self.change_state('posted')
+
+
+class Disbursements(models.Model):
+    _name = 'disbursements.ranchi'
+    _rec_name = 'name'
+    _description = 'Disbursement Table'
+
+    name = fields.Char()
+    union_id = fields.Many2one(comodel_name="union.ranchy", string="", required=False, )
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", )
+    loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan")
+    disbursed_amount = fields.Float(string="Disbursed Amount",  required=False, )
+    mode = fields.Selection(string="Mode of Disburse", selection=[('cash', 'Cash'), ('cheque', 'Cheque'),
+                                                                  ('transfer', 'Transfer')], required=False, )
+    state = fields.Selection(string="Status", selection=[('disbursed', 'Disbursed'), ('posted', 'Posted'), ],
+                             required=False, default='disbursed')
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
+    mode_ref = fields.Char(string="Cheque / Ref", required=False, )
+
+
+
 
