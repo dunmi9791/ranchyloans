@@ -111,7 +111,7 @@
                       </group>
                       <notebook>
                           <page string="Scheduled Installments">
-                              <button name="compute_schedule" string="Compute Schedule" class="oe_highlight"  groups="" type="object"/>
+<!--                              <button name="compute_schedule" string="Compute Schedule" class="oe_highlight"  groups="" type="object"/>-->
                               <field name="schedule_installments_ids">
                                   <tree>
                                      <field name="date"/>
