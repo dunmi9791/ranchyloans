@@ -19,7 +19,7 @@ class LoansRanchy(models.Model):
     app_date = fields.Date(string="Date of Application", required=False, )
     member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=True,
                                 track_visibility=True, trace_visibility='onchange',)
-    group = fields.Many2one(string="Group/Union", related="member_id.group_id", readonly=True,)
+    group = fields.Many2one(string="Group/Union", related="member_id.group_id", readonly=True, store=True)
     avg_monthly = fields.Float(string="Average Monthly Income",  required=False, )
     last_loan = fields.Float(string="Last Loan Received", required=False, )
     date_fullypaid = fields.Date(string="Date Last Loan was Fully Paid", required=False)
