@@ -39,10 +39,21 @@ class CollectAmount(models.TransientModel):
                 return False
         return True
 
+    def _multiple(self):
+        # m = self.collected_amount
+        # n = self.scheduled_amount
+        return True if self.collected_amount % self.scheduled_amount == 0 else False
+
     _constraints = [
         (_check_limit, 'Please check that you have linked the correct amount of scheduled installments',
          ['installment_limit', 'linked_schedule_ids']),
+        (_multiple, 'Loan Amount Collected must be in Multiples of Scheduled Installment',
+         ['installment_limit', 'linked_schedule_ids']),
     ]
+
+
+
+
 
     @api.one
     @api.depends('collected_amount', 'collected_savings')
