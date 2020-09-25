@@ -17,11 +17,32 @@ class CollectAmount(models.TransientModel):
     collected_by = fields.Many2one(string="Collected By", required=False, )
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Active Loan", required=False)
     linked_schedule_ids = fields.Many2many(comodel_name="schedule.installments", relation="", column1="", column2="",
-                                           string="Linked Scheduled Installments", )
+                                           string="Linked Scheduled Installments", required=True, )
     current_user = fields.Many2one('res.users', 'Current User', default=lambda self: self.env.user)
     no_installments = fields.Integer(string="Number of Installments Paid", required=False, default=1,)
     collected_total = fields.Integer(string="Total Collected", compute="_total_collected", )
     date = fields.Date(string="Date", required=False, default=date.today())
+    collection_id = fields.Many2one('collection.ranchy', invisible=1)
+    installment_limit = fields.Integer(string="", compute="_limit")
+
+    def _limit(self):
+        self.installment_limit = self.collected_amount / self.scheduled_amount
+
+    def _check_limit(self):
+        new_list = []
+        for obj in self:
+            if obj.installment_limit <= 0:
+                return False
+            for field in obj.linked_schedule_ids:
+                new_list.append(field.id)
+            if obj.installment_limit != len(new_list):
+                return False
+        return True
+
+    _constraints = [
+        (_check_limit, 'Please check that you have linked the correct amount of scheduled installments',
+         ['installment_limit', 'linked_schedule_ids']),
+    ]
 
     @api.one
     @api.depends('collected_amount', 'collected_savings')
@@ -43,8 +64,7 @@ class CollectAmount(models.TransientModel):
     @api.one
     @api.depends('')
     def collect_amount(self):
-        collection = self.env['collection.ranchy']
-        vals = {
+        collection = self.env['collection.ranchy'].create({
             'member': self.member_id.id,
             'loan_id': self.loan_id.id,
             'collect_loan': self.collected_amount,
@@ -53,8 +73,19 @@ class CollectAmount(models.TransientModel):
             'linked_installments_ids': [(6,  0, self.linked_schedule_ids.ids)],
             'state': 'collected',
             'date': self.date,
+        })
+
+        self.collection_id = collection
+        payment = self.env['payments.ranchy']
+        payment_detail = {
+            'loan_id': self.loan_id.id,
+            'amount': self.collected_amount,
+            'date': date.today(),
+            'collection_id': self.collection_id.id,
         }
-        collection.create(vals)
+        payment.create(payment_detail)
+        for installment in self.linked_schedule_ids:
+            installment.state = 'paid'
 
 
 class WithdrawAmount(models.TransientModel):

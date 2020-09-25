@@ -463,6 +463,14 @@ class ScheduleInstallments(models.Model):
                 'date': date.today(),
             })
         self.collection_id = collection
+        payment = self.env['payments.ranchy']
+        payment_detail ={
+            'loan_id': self.loan_id.id,
+            'amount': self.installment,
+            'date': date.today(),
+            'collection_id': self.collection_id.id,
+        }
+        payment.create(payment_detail)
 
         self.change_state('paid')
 
@@ -476,6 +484,7 @@ class LoanPayments(models.Model):
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan", required=False, )
     amount = fields.Integer(string="Amount Paid")
     date = fields.Date(string="Date")
+    collection_id = fields.Many2one('collection.ranchy', invisible=1)
 
 
 class CollectionRanchy(models.Model):
@@ -485,22 +494,25 @@ class CollectionRanchy(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char()
-    member = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
+    member = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, track_visibility=True, trace_visibility='onchange')
     group = fields.Many2one(string="Group/Union", related="member.group_id", readonly=True, store=True)
     scheduled = fields.Float(string="Expected Installment", related="loan_id.installment_amount")
-    loan_id = fields.Many2one(string="Active Loan", comodel_name="loans.ranchy")
-    collect_loan = fields.Integer(string="Collected Loan amount", )
-    collect_savings = fields.Integer(string="Collected Savings",)
-    no_installments = fields.Integer(string="number of installments", compute="_no_installment")
+    loan_id = fields.Many2one(string="Active Loan", comodel_name="loans.ranchy", track_visibility=True,)
+    collect_loan = fields.Integer(string="Collected Loan amount", track_visibility=True, trace_visibility='onchange')
+    collect_savings = fields.Integer(string="Collected Savings", trace_visibility='onchange')
+    no_installments = fields.Integer(string="number of installments", compute="_no_installment",
+                                     track_visibility=True, trace_visibility='onchange')
     linked_installments_ids = fields.Many2many(comodel_name="schedule.installments", relation="collection_schedule_rel", column1="collection_id", column2="schedule_id", string="Linked Installments", )
     state = fields.Selection(string="", selection=[('draft', 'Draft'), ('collected', 'Collected'),
-                                                   ('confirmed', 'Confirmed'), ], required=False, )
-    collected_by = fields.Many2one('res.users', 'Collected By', default=lambda self: self.env.user)
-    collected_total = fields.Integer(string="Total Collected", compute="_total_collected", store=True)
-    date = fields.Date(string="Date", required=False, default=date.today())
+                                                   ('confirmed', 'Confirmed'), ], required=False, track_visibility=True, trace_visibility='onchange' )
+    collected_by = fields.Many2one('res.users', 'Collected By', default=lambda self: self.env.user,
+                                   track_visibility=True,trace_visibility='onchange')
+    collected_total = fields.Integer(string="Total Collected", compute="_total_collected", store=True, track_visibility=True,)
+    date = fields.Date(string="Date", required=False, default=date.today(),
+                       track_visibility=True, trace_visibility='onchange')
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
-    description = fields.Char(string="Description", required=False, )
+    description = fields.Char(string="Description", required=False, trace_visibility='onchange')
     # savings_balance = fields.Float(string="Saving Balance", related="member.balance", store=True)
     # loan_balance = fields.Integer(string="Loan Balance", related="loan_id.balance_loan", store=True)
     # journal_id = fields.Many2one('account.journal', string='Journal', required=True,
