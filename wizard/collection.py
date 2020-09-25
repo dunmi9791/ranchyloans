@@ -176,6 +176,10 @@ class LapseAdjustments(models.TransientModel):
         }
         withdrawal.create(vals)
         collection = self.env['collection.ranchy']
+        linked =[]
+        linked_env = self.env['schedule.installments'].search([('loan_id', '=', self.loan_id.id), ('state', '=', 'unpaid')])
+        for link in linked_env:
+            linked.append(link.id)
         values = {
             'member': self.member_id.id,
             'loan_id': self.loan_id.id,
@@ -183,7 +187,7 @@ class LapseAdjustments(models.TransientModel):
             'description': 'Lapse Adjustment',
             'state': 'collected',
             'date': self.date,
-            'linked_installments_ids': [(6, 0, self.linked_schedule_ids.ids)],
+            'linked_installments_ids': [(6, 0, linked)],
 
         }
         collection.create(values)

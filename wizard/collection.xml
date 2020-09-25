@@ -145,7 +145,6 @@
                         <field name="balance"/>
                         <field name="loan_balance"/>
                         <field name="difference"/>
-                        <field name="linked_schedule_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
                     </group>
                 </group>
                 <footer>

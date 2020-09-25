@@ -544,6 +544,17 @@
               </tree>
           </field>
       </record>
+      <record id="second_ranchy_withdrawal_tree" model="ir.ui.view">
+          <field name="name">second.ranchy.withdrawal.tree</field>
+          <field name="model">withdrawals.ranchy</field>
+          <field name="arch" type="xml">
+              <tree string="Withdrawals">
+                  <field name="date"/>
+                  <field name="member_id"/>
+                  <field name="amount"/>
+              </tree>
+          </field>
+      </record>
 
 
   </data>
