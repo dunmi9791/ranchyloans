@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5778ffae-3c8e-4f82-8825-d3e243f440b7" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/menus.xml" beforeDir="false" afterPath="$PROJECT_DIR$/views/menus.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/views.xml" beforeDir="false" afterPath="$PROJECT_DIR$/views/views.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wizard/collection.py" beforeDir="false" afterPath="$PROJECT_DIR$/wizard/collection.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wizard/collection.xml" beforeDir="false" afterPath="$PROJECT_DIR$/wizard/collection.xml" afterDir="false" />
-    </list>
+    <list default="true" id="5778ffae-3c8e-4f82-8825-d3e243f440b7" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -215,7 +208,14 @@
       <option name="project" value="LOCAL" />
       <updated>1601826431164</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="savings collection">
+      <created>1601829944756</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1601829944757</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -249,7 +249,8 @@
     <MESSAGE value="added collection multiples constrain" />
     <MESSAGE value="added auto linked" />
     <MESSAGE value="loan repayment" />
-    <option name="LAST_COMMIT_MESSAGE" value="loan repayment" />
+    <MESSAGE value="savings collection" />
+    <option name="LAST_COMMIT_MESSAGE" value="savings collection" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
