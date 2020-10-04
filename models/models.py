@@ -374,6 +374,7 @@ class Savings(models.Model):
     member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
     date = fields.Date(string="Date", required=False, )
     amount = fields.Integer(string="Amount", required=False, )
+    note = fields.Char(string="Note", required=False, )
 
 
 class Withdrawals(models.Model):
@@ -518,6 +519,7 @@ class CollectionRanchy(models.Model):
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
     description = fields.Char(string="Description", required=False, trace_visibility='onchange')
+    note = fields.Char(string="Note", required=False, )
     # savings_balance = fields.Float(string="Saving Balance", related="member.balance", store=True)
     # loan_balance = fields.Integer(string="Loan Balance", related="loan_id.balance_loan", store=True)
     # journal_id = fields.Many2one('account.journal', string='Journal', required=True,
@@ -572,6 +574,7 @@ class CollectionRanchy(models.Model):
             'member_id': self.member.id,
             'amount': self.collect_savings,
             'date': self.date,
+            'note': self.note
         }
         savings.create(vals)
         loan_repayment = self.env['payments.ranchy']

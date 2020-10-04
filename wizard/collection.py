@@ -362,3 +362,47 @@ class CollectLoanAmount(models.TransientModel):
         payment.create(payment_detail)
         for installment in self.linked_schedule_ids:
             installment.state = 'paid'
+
+
+class CollectSavingsAmount(models.TransientModel):
+    _name = 'collect.savings.amount'
+    _description = 'Collect Savings Amount Wizard'
+
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False, )
+    member_name = fields.Char(string="Member", related="member_id.name")
+    group = fields.Many2one(string="Group/Union", comodel_name="union.ranchy" )
+    co_id = fields.Many2one(related="member_id.group_id.co_id", string="Credit Officer", readonly=True, )
+    collected_savings = fields.Float(string="Collected Amount Saving", required=False, )
+    collected_by = fields.Many2one(string="Collected By", required=False, )
+    current_user = fields.Many2one('res.users', 'Current User', default=lambda self: self.env.user)
+    date = fields.Date(string="Date", required=False, default=date.today())
+    collection_id = fields.Many2one('collection.ranchy', invisible=1)
+    note = fields.Char(string="Note", required=False, )
+
+    def _multiple_savings(self):
+        # m = self.collected_amount
+        # n = self.scheduled_amount
+        return True if self.collected_savings % 500 == 0 else False
+
+    _constraints = [
+        (_multiple_savings, 'Savings Collected must be in multiples of NGN500', ['collected_savings'])
+    ]
+
+    @api.onchange('group')
+    def _onchange_group(self):
+        if self.group:
+            members_ids = self.group.members_ids.ids
+            return {'domain': {'member_id': [('id', 'in', members_ids)]}}
+
+    @api.one
+    @api.depends('')
+    def collect_amount(self):
+        collection = self.env['collection.ranchy'].create({
+            'member': self.member_id.id,
+            'collect_savings': self.collected_savings,
+            'state': 'collected',
+            'date': self.date,
+            'note': self.note,
+        })
+
+        self.collection_id = collection

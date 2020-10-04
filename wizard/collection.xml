@@ -203,5 +203,39 @@
         <field name="view_id" ref="collect_loan_repayment_form"/>
         <field name="target">new</field>
     </record>
+    <record id="collect_savings_form" model="ir.ui.view">
+         <field name="name">collect.savings.wizard</field>
+         <field name="model">collect.savings.amount</field>
+         <field name="arch" type="xml">
+            <form string="Collect Savings">
+                <group>
+                    <group>
+                        <field name="group"/>
+                        <field name="member_id"/>
+                        <field name="collected_savings" widget="monetary"/>
+                        <field name="note"/>
+                    </group>
+                    <group>
+                        <field name="member_name"/>
+                        <field name="co_id"/>
+                    </group>
+
+                </group>
+                <footer>
+
+                    <button name="collect_amount" string="Enter Collection" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+         </field>
+     </record>
+    <record id="collect_savings_amount_wizard" model="ir.actions.act_window">
+        <field name="name">Collect Savins Amount</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">collect.savings.amount</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="collect_savings_form"/>
+        <field name="target">new</field>
+    </record>
 
 </odoo>
