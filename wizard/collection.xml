@@ -42,6 +42,7 @@
         <field name="view_id" ref="collect_repayment_form"/>
         <field name="target">new</field>
     </record>
+
     <record id="withdraw_amount_form" model="ir.ui.view">
          <field name="name">withdraw.amount.wizard</field>
          <field name="model">withdraw.amount</field>
@@ -161,6 +162,45 @@
         <field name="res_model">lapse.adjustment</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="lapse_adjustment_form"/>
+        <field name="target">new</field>
+    </record>
+    <record id="collect_loan_repayment_form" model="ir.ui.view">
+         <field name="name">collect.loan.repayment.wizard</field>
+         <field name="model">collect.loan.amount</field>
+         <field name="arch" type="xml">
+            <form string="Collect Repayment">
+                <group>
+                    <group>
+                        <field name="group"/>
+                        <field name="member_id"/>
+                        <field name="loan_id"  domain="[('state','=','disbursed')]"/>
+                        <field name="collected_amount" widget="monetary" options='{"type": "float", "step": 1}'/>
+                        <field name="collected_savings" widget="monetary"/>
+                        <field name="no_installments" options='{"type": "number", "step": 1}'/>
+                        <field name="linked_schedule_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                    </group>
+                    <group>
+                        <field name="member_name"/>
+                        <field name="co_id"/>
+                        <field name="scheduled_amount"/>
+                        <field name="collected_total" widget="monetary"/>
+                    </group>
+
+                </group>
+                <footer>
+
+                    <button name="collect_amount" string="Enter Collection" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+         </field>
+     </record>
+    <record id="collect_loan_amount_wizard" model="ir.actions.act_window">
+        <field name="name">Collect Amount</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">collect.loan.amount</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="collect_loan_repayment_form"/>
         <field name="target">new</field>
     </record>
 

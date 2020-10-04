@@ -110,6 +110,11 @@ class LoansRanchy(models.Model):
     def _loan_balance(self):
         self.balance_loan = self.payment_amount - self.total_realised
 
+    @api.onchange('balance_loan')
+    def _onchange_balance_loan(self):
+        if self.balance_loan == 0.00:
+            self.change_state('paid')
+
     @api.multi
     def is_allowed_transition(self, old_state, new_state):
         allowed = [('draft', 'applied'),

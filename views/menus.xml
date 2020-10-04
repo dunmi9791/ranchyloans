@@ -183,7 +183,7 @@
         <menuitem id="loans_ranchy_members_menu" name="Loans" parent="ranchy_loans_menu" action="loans_action" sequence="1"/>
         <menuitem id="loantype_ranchy_menu" name="Loan Type" parent="ranchy_settings_menu" action="loantype_action" sequence="1"/>
         <menuitem id="union_ranchy_menu" name="Union" parent="ranchy_members_menu" action="union_action" sequence="2"/>
-        <menuitem id="repayment_ranchy_menu" name="Loan Repayment" parent="ranchy_collection_menu" action="collect_amount_wizard" sequence="2"/>
+        <menuitem id="repayment_ranchy_menu" name="Loan Repayment" parent="ranchy_collection_menu" action="collect_loan_amount_wizard" sequence="2"/>
         <menuitem id="withdrawal_ranchy_menu" name="Withdrawals" parent="ranchy_collection_menu" action="withdrawals_action" sequence="3"/>
         <menuitem id="adjustment_ranchy_menu" name="Lapse Adjustment" parent="ranchy_collection_menu" action="lapse_adjustment_wizard" sequence="4"/>
         <menuitem id="scheduled_ranchy_menu" name="Scheduled Payments" parent="ranchy_collection_menu" action="scheduled_payments" sequence="5"/>

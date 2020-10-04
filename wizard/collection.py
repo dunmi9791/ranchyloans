@@ -256,3 +256,109 @@ class DisburseWiz(models.TransientModel):
         self.loan_id.change_state('disbursed')
 
 
+class CollectLoanAmount(models.TransientModel):
+    _name = 'collect.loan.amount'
+    _description = 'Collect Loan Amount Wizard'
+
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=False, )
+    member_name = fields.Char(string="Member", related="member_id.name")
+    group = fields.Many2one(string="Group/Union", comodel_name="union.ranchy" )
+    co_id = fields.Many2one(related="member_id.group_id.co_id", string="Credit Officer", readonly=True, )
+    scheduled_amount = fields.Float(string="Scheduled Loan Amount", related="loan_id.installment_amount",  required=False, )
+    collected_amount = fields.Float(string="Collected Amount Loan", required=False, )
+    collected_savings = fields.Float(string="Collected Amount Saving", required=False, )
+    collected_by = fields.Many2one(string="Collected By", required=False, )
+    loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Active Loan", required=False)
+    linked_schedule_ids = fields.Many2many(comodel_name="schedule.installments", relation="", column1="", column2="",
+                                           string="Linked Scheduled Installments", required=True, )
+    current_user = fields.Many2one('res.users', 'Current User', default=lambda self: self.env.user)
+    no_installments = fields.Integer(string="Number of Installments Paid", required=False, default=1,)
+    collected_total = fields.Integer(string="Total Collected", compute="_total_collected", )
+    date = fields.Date(string="Date", required=False, default=date.today())
+    collection_id = fields.Many2one('collection.ranchy', invisible=1)
+    installment_limit = fields.Integer(string="", compute="_limit")
+
+    def _limit(self):
+        self.installment_limit = self.collected_amount / self.scheduled_amount
+
+    def _check_limit(self):
+        new_list = []
+        for obj in self:
+            if obj.installment_limit <= 0:
+                return False
+            for field in obj.linked_schedule_ids:
+                new_list.append(field.id)
+            if obj.installment_limit != len(new_list):
+                return False
+        return True
+
+    def _multiple(self):
+        # m = self.collected_amount
+        # n = self.scheduled_amount
+        return True if self.collected_amount % self.scheduled_amount == 0 else False
+
+    def _multiple_savings(self):
+        # m = self.collected_amount
+        # n = self.scheduled_amount
+        return True if self.collected_savings % 500 == 0 else False
+
+    _constraints = [
+        (_check_limit, 'Please check that you have linked the correct amount of scheduled installments',
+         ['installment_limit', 'linked_schedule_ids']),
+        (_multiple, 'Loan Amount Collected must be in Multiples of Scheduled Installment',
+         ['installment_limit', 'linked_schedule_ids']),
+        (_multiple_savings, 'Savings Collected must be in multiples of NGN500', ['collected_savings'])
+    ]
+
+
+
+
+
+    @api.one
+    @api.depends('collected_amount', 'collected_savings')
+    def _total_collected(self):
+        self.collected_total = self.collected_amount + self.collected_savings
+
+    @api.onchange('group')
+    def _onchange_group(self):
+        if self.group:
+            members_ids = self.group.members_ids.ids
+            return {'domain': {'member_id': [('id', 'in', members_ids)]}}
+
+    @api.onchange('member_id')
+    def _onchange_member_id(self):
+        if self.member_id:
+            loan_ids = self.member_id.loan_ids.ids
+            return {'domain': {'loan_id': [('id', 'in', loan_ids), ('state', '=', 'disbursed')]}}
+
+    @api.onchange('loan_id')
+    def _onchange_loan_id(self):
+        if self.loan_id:
+            schedule_ids = self.loan_id.schedule_installments_ids.ids
+            return {'domain': {'linked_schedule_ids': [('id', 'in', schedule_ids), ('state', '=', 'unpaid')]}}
+
+    @api.one
+    @api.depends('')
+    def collect_amount(self):
+        collection = self.env['collection.ranchy'].create({
+            'member': self.member_id.id,
+            'loan_id': self.loan_id.id,
+            'collect_loan': self.collected_amount,
+            'collect_savings': self.collected_savings,
+            'no_installments': self.no_installments,
+            'linked_installments_ids': [(6,  0, self.linked_schedule_ids.ids)],
+            'state': 'collected',
+            'date': self.date,
+        })
+
+        self.collection_id = collection
+        payment = self.env['payments.ranchy']
+        payment_detail = {
+            'loan_id': self.loan_id.id,
+            'amount': self.collected_amount,
+            'date': date.today(),
+            'collection_id': self.collection_id.id,
+        }
+        payment.create(payment_detail)
+        for installment in self.linked_schedule_ids:
+            installment.state = 'paid'
