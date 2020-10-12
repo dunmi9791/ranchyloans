@@ -397,12 +397,13 @@ class CollectSavingsAmount(models.TransientModel):
     @api.one
     @api.depends('')
     def collect_amount(self):
-        collection = self.env['collection.ranchy'].create({
+        collection = self.env['collection.ranchy']
+        vals ={
             'member': self.member_id.id,
             'collect_savings': self.collected_savings,
             'state': 'collected',
             'date': self.date,
             'note': self.note,
-        })
+        }
+        collection.create(vals)
 
-        self.collection_id = collection

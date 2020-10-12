@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5778ffae-3c8e-4f82-8825-d3e243f440b7" name="Default Changelist" comment="" />
+    <list default="true" id="5778ffae-3c8e-4f82-8825-d3e243f440b7" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/views/menus.xml" beforeDir="false" afterPath="$PROJECT_DIR$/views/menus.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wizard/collection.py" beforeDir="false" afterPath="$PROJECT_DIR$/wizard/collection.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -215,7 +219,14 @@
       <option name="project" value="LOCAL" />
       <updated>1601829944757</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="savings collection">
+      <created>1601835287388</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1601835287391</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
