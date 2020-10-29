@@ -19,7 +19,7 @@ class LoansRanchy(models.Model):
     app_date = fields.Date(string="Date of Application", required=False, )
     member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=True,
                                 track_visibility=True, trace_visibility='onchange',)
-    group = fields.Many2one(string="Group/Union", related="member_id.group_id", readonly=True, store=True)
+    group = fields.Many2one(string="Group/Union", comodel_name="union.ranchy",)
     avg_monthly = fields.Float(string="Average Monthly Income",  required=False, )
     last_loan = fields.Float(string="Last Loan Received", required=False, )
     date_fullypaid = fields.Date(string="Date Last Loan was Fully Paid", required=False)
@@ -71,6 +71,12 @@ class LoansRanchy(models.Model):
     fee_paid = fields.Boolean(string="Fees Paid")
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True, default=lambda self: self.env.user.company_id)
     fees_collected = fields.Boolean(string="",  )
+
+    @api.onchange('group')
+    def _onchange_group_id(self):
+        if self.group:
+            members_ids = self.group.members_ids.ids
+            return {'domain': {'member_id': [('id', 'in', members_ids),]}}
 
     @api.one
     @api.depends('amount_approved')
@@ -314,6 +320,14 @@ class MembersRanchy(models.Model):
     collection_ids = fields.One2many(comodel_name="collection.ranchy", inverse_name="member", string="Collections")
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
+
+    @api.multi
+    def name_get(self):
+        result = []
+        for record in self:
+            record_name = record.name + ' - ' + record.member_no
+            result.append((record.id, record_name))
+        return result
 
     @api.one
     @api.depends('first_name', 'surname')

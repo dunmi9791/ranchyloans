@@ -81,8 +81,8 @@
                               <field name="type"/>
                               <field name="stage_id"/>
                               <field name="app_date"/>
-                              <field name="member_id"/>
-                              <field name="group"/>
+                              <field name="group" widget='selection'/>
+                              <field name="member_id" widget='selection'/>
                               <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                           </group>
                           <group>
