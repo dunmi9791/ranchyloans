@@ -6,6 +6,9 @@ from odoo.tools.translate import _
 from dateutil import relativedelta
 from datetime import datetime
 from datetime import date
+from odoo.tools import float_is_zero, float_compare
+from odoo.tools.safe_eval import safe_eval
+from odoo.addons import decimal_precision as dp
 
 
 class LoansRanchy(models.Model):
@@ -27,6 +30,7 @@ class LoansRanchy(models.Model):
                                 track_visibility=True, trace_visibility='onchange',)
     amount_approved = fields.Float(string="Amount Approved", required=False,
                                    track_visibility=True, trace_visibility='onchange',)
+    credit = fields.Monetary(default=0.0, currency_field='currency_id')
     no_install = fields.Integer (string="Number of Installments", related="type.no_installments", readonly=True,)
     duration = fields.Char(string="Loan Duration", required=False)
     date_first = fields.Date(string="Date First Installment is Due", required=False)
@@ -71,6 +75,12 @@ class LoansRanchy(models.Model):
     fee_paid = fields.Boolean(string="Fees Paid")
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True, default=lambda self: self.env.user.company_id)
     fees_collected = fields.Boolean(string="",  )
+    currency_id = fields.Many2one('res.currency', compute='_compute_currency', store=True, string="Currency")
+
+    @api.one
+    @api.depends('company_id')
+    def _compute_currency(self):
+        self.currency_id = self.company_id.currency_id or self.env.user.company_id.currency_id
 
     @api.onchange('group')
     def _onchange_group_id(self):
@@ -300,7 +310,15 @@ class MembersRanchy(models.Model):
                                                                         ('tertiary', 'Tertiary'), ], required=False)
     nok = fields.Char(string="next of Kin", required=False, track_visibility=True, trace_visibility='onchange',)
     nok_phone = fields.Char(string="NOK Phone", required=False, track_visibility=True, trace_visibility='onchange',)
-    group_id = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", required=False, track_visibility=True, trace_visibility='onchange', )
+    group_id = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", required=False, track_visibility=True,
+                               trace_visibility='onchange', )
+    union_card_no = fields.Selection(string="Union Card", selection=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),
+                                                           ('6', '6'), ('7', '7'), ('8', '8'), ('9', '9'), ('10', '10'),
+                                                           ('11', '11'), ('12', '12'), ('13', '13'), ('14', '14'),
+                                                           ('15', '15'), ('16', '16'), ('17', '17'), ('18', '18'), ('19', '19'),
+                                                           ('20', '20'), ('21', '21'), ('22', '22'), ('23', '23'), ('24', '24'),
+                                                           ('25', '25'), ('26', '26'), ('27', '27'), ('28', '28'), ('29', '29'),
+                                                           ('30', '30'), ('31', '31'), ], required=False, )
     m_photo = fields.Binary(string="", track_visibility=True, trace_visibility='onchange', attachment=True, readonly=False, )
     saving_ids = fields.One2many(comodel_name="savings.ranchy", inverse_name="member_id", string="Savings", required=False, )
     withdrawal_ids = fields.One2many(comodel_name="withdrawals.ranchy", inverse_name="member_id", string="Withdrawals",
@@ -493,6 +511,15 @@ class ScheduleInstallments(models.Model):
         payment.create(payment_detail)
 
         self.change_state('paid')
+
+    @api.multi
+    @api.depends('date')
+    def _reschedule_date(self):
+        loan_id = self.loan_id
+        schedules = loan_id.schedule_installments_ids.date
+        latestdate = max(schedules)
+        new_date = latestdate + relativedelta.relativedelta(weeks=+1)
+        self.date = new_date
 
 
 class LoanPayments(models.Model):

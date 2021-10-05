@@ -27,6 +27,7 @@
                        <group>
                            <field name="company_id" groups="base.group_multi_company" invisible="1"/>
                            <field name="group_id"/>
+                           <field name="union_card_no"/>
                            <field name="b_address"/>
                            <field name="balance"/>
                        </group>
@@ -94,6 +95,8 @@
                           </group>
                           <group>
                               <field name="amount_approved" widget="monetary"/>
+                              <field name="currency_id" invisible="1"/>
+                              <field name="credit" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                               <field name="no_install"/>
                               <field name="duration"/>
                               <field name="date_first"/>

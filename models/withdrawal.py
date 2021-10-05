@@ -191,5 +191,13 @@ class Disbursements(models.Model):
     mode_ref = fields.Char(string="Cheque / Ref", required=False, )
 
 
+class NoWorkDays(models.Model):
+    _name = 'no_work.days'
+    _rec_name = 'name'
+    _description = 'New Description'
+
+    name = fields.Char()
+
+
 
 
