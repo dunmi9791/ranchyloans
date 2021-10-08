@@ -1,0 +1,33 @@
+<odoo>
+    <data>
+        <record id="open_member_loans" model="ir.actions.act_window">
+        <field name="name">Loans</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">loans.ranchy</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('member_id','=',active_id)]</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+
+          </p>
+        </field>
+    </record>
+        <record id="open_member_collections" model="ir.actions.act_window">
+        <field name="name">Collections</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">collection.ranchy</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="domain">[('member','=',active_id)]</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+
+          </p>
+        </field>
+    </record>
+
+    </data>
+</odoo>
+
+

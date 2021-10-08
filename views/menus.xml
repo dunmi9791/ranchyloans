@@ -71,32 +71,7 @@
               </p>
             </field>
         </record>
-        <record id="open_member_loans" model="ir.actions.act_window">
-        <field name="name">Loans</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">loans.ranchy</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="domain">[('member_id','=',active_id)]</field>
-        <field name="help" type="html">
-          <p class="o_view_nocontent_smiling_face">
 
-          </p>
-        </field>
-    </record>
-        <record id="open_member_collections" model="ir.actions.act_window">
-        <field name="name">Collections</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">collection.ranchy</field>
-        <field name="view_type">form</field>
-        <field name="view_mode">tree,form</field>
-        <field name="domain">[('member','=',active_id)]</field>
-        <field name="help" type="html">
-          <p class="o_view_nocontent_smiling_face">
-
-          </p>
-        </field>
-    </record>
         <record id="scheduled_payments" model="ir.actions.act_window">
             <field name="name">Scheduled Payments</field>
             <field name="type">ir.actions.act_window</field>
@@ -150,20 +125,20 @@
               </p>
             </field>
         </record>
-<!--        <record id="withdrawals_action" model="ir.actions.act_window">-->
-<!--            <field name="name">Withdrawals</field>-->
-<!--            <field name="type">ir.actions.act_window</field>-->
-<!--            <field name="res_model">withdrawals.ranchy</field>-->
-<!--            <field name="view_mode">tree,form</field>-->
-<!--            <field name="view_id" ref="second_ranchy_withdrawal_tree"/>-->
-<!--            <field name="help" type="html">-->
-<!--              <p class="oe_view_nocontent_create">-->
-<!--                &lt;!&ndash; Add Text Here &ndash;&gt;-->
-<!--              </p><p>-->
-<!--                &lt;!&ndash; More details about what a user can do with this object will be OK &ndash;&gt;-->
-<!--              </p>-->
-<!--            </field>-->
-<!--        </record>-->
+        <record id="withdrawals_action" model="ir.actions.act_window">
+            <field name="name">Withdrawals</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">withdrawals.ranchy</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="ranchyloans.second_ranchy_withdrawal_tree"/>
+            <field name="help" type="html">
+              <p class="oe_view_nocontent_create">
+                <!-- Add Text Here -->
+              </p><p>
+                <!-- More details about what a user can do with this object will be OK -->
+              </p>
+            </field>
+        </record>
 
 
         <menuitem name="Ranchi Loans" id="ranchy_loans_root_menu" web_icon="ranchyloans,static/src/img/icon.png"/>
