@@ -278,6 +278,42 @@ class UnionRanchy(models.Model):
                                                                 ('friday', 'Friday'), ], required=False, )
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
+    union_purse_ids = fields.One2many(comodel_name="union.purse", inverse_name="union_id", string='Purse')
+
+
+class UnionPurse(models.Model):
+    _name = 'union.purse'
+    _rec_name = ''
+    _description = 'Table for union purse'
+
+    union_id = fields.Many2one( comodel_name='union.ranchy', string='Union_id', required=False)
+    date = fields.Date(string='Date', required=False)
+    details = fields.Char(string='Details', required=False)
+    debit = fields.Float(string='Debit', required=False)
+    credit = fields.Float(string='Credit', required=False)
+    balance = fields.Float(string='Balance', compute='_purse_balance', required=False)
+    previous_balance = fields.Float(string='previous balance')
+
+    @api.model
+    def create(self, vals):
+        res=super(UnionPurse, self).create(vals)
+        if res.debit or res.credit:
+            balance_ids = self.search([('union_id', '=', self.union_id.id)], order='id desc', limit=1)
+            previous_record = balance_ids.id
+            if previous_record.balance:
+                res.previous_balance = previous_record.balance
+            else:
+                res.previous_balance = 0
+
+    @api.multi
+    def _purse_balance(self):
+        if self.debit:
+            self.balance = self.previous_balance + self.debit
+
+        elif self.credit:
+            self.balance = self.previous_balance - self.credit
+
+
 
 
 class DisbursementRanchy(models.Model):

@@ -175,6 +175,9 @@
                               <field name="members_ids" readonly="1"/>
 
                           </page>
+                          <page string="Union Purse">
+                              <field name="union_purse_ids" readonly="1"/>
+                          </page>
                       </notebook>
                   </sheet>
                    <div class="oe_chatter">
@@ -543,6 +546,7 @@
                   <field name="loan_id"/>
                   <field name="risk_premium"/>
                   <field name="admin_charge"/>
+                  <field name="union_purse"/>
                   <field name="amount"/>
                   <field name="state"/>
               </tree>

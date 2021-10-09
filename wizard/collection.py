@@ -210,23 +210,39 @@ class CollectFees(models.TransientModel):
     risk_premium = fields.Float(string="Risk Premium",  required=False, )
     amount = fields.Float(string="Collected Amount",  required=False, )
     admin_charge = fields.Float(string="Administrative Charge")
+    union_purse = fields.Float(string="Union Purse")
+
+    @api.constrains('union_purse')
+    def check_union_purse(self):
+        for rec in self:
+            if rec.union_purse < 1000:
+                raise UserError(_("Union Purse Should be at least NGN1000"))
 
     @api.constrains('amount')
     def check_amount(self):
         for rec in self:
-            if rec.amount != rec.risk_premium + rec.admin_charge:
-                raise UserError(_("Amount collected must be equal to Risk Premium plus Admin Charge."))
+            if rec.amount != rec.risk_premium + rec.admin_charge + rec.union_purse:
+                raise UserError(_("Amount collected must be equal to Risk Premium plus Admin Charge and Union purse"))
+
 
     def collect_fees(self):
         collection = self.env['fees.collection']
+        purse = self.env['union.purse']
         vals = {
             'amount': self.amount,
             'loan_id': self.loan_id.id,
             'risk_premium': self.risk_premium,
             'admin_charge': self.admin_charge,
+            'union_purse': self.union_purse,
 
         }
         collection.create(vals)
+        inputs = {
+            'union_id': self.loan_id.group.id,
+            'debit': self.union_purse,
+            'details': self.loan_id.loan_no,
+        }
+        purse.create(inputs)
         self.loan_id.fees_collected = True
 
 

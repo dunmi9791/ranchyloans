@@ -142,10 +142,12 @@ class FeesCollection(models.Model):
     name = fields.Char()
     loan_id = fields.Many2one(comodel_name="loans.ranchy", string="Loan Id", required=False, )
     member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", related="loan_id.member_id")
+    union_id = fields.Many2one(comodel_name="union.ranchy", string="Union", related="loan_id.member_id.group_id")
     date = fields.Date(string="Date", required=False, default=date.today())
     risk_premium = fields.Float(string="Risk Premium", required=False, )
     amount = fields.Float(string="Total", required=False, )
     admin_charge = fields.Float(string="Administrative Charge")
+    union_purse = fields.Float(string="Union Purse")
     state = fields.Selection(string="Status", selection=[('collected', 'Collected'), ('posted', 'Posted'), ],
                              required=False, default='collected')
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,

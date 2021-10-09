@@ -83,6 +83,7 @@
                     <field name="date"/>
                     <field name="risk_premium"/>
                     <field name="admin_charge"/>
+                    <field name="union_purse" widget="monetary"/>
                     <field name="amount" widget="monetary"/>
                 </group>
                 <footer>
