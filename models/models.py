@@ -286,32 +286,32 @@ class UnionPurse(models.Model):
     _rec_name = ''
     _description = 'Table for union purse'
 
-    union_id = fields.Many2one( comodel_name='union.ranchy', string='Union_id', required=False)
+    union_id = fields.Many2one( comodel_name='union.ranchy', string='Union', required=False)
     date = fields.Date(string='Date', required=False)
     details = fields.Char(string='Details', required=False)
     debit = fields.Float(string='Debit', required=False)
     credit = fields.Float(string='Credit', required=False)
-    balance = fields.Float(string='Balance', compute='_purse_balance', required=False)
-    previous_balance = fields.Float(string='previous balance')
+    balance = fields.Float(string='Balance', compute='_purse_balance', required=False, store=True)
+    previous_balance = fields.Float(string='previous balance', compute='_previous_record',)
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
 
-    @api.model
-    def create(self, vals):
-        res=super(UnionPurse, self).create(vals)
-        if res.debit or res.credit:
-            balance_ids = self.search([('union_id', '=', self.union_id.id)], order='id desc', limit=1)
-            previous_record = balance_ids.id
-            if previous_record.balance:
-                res.previous_balance = previous_record.balance
-            else:
-                res.previous_balance = 0
+    @api.one
+    @api.depends('union_id', )
+    def _previous_record(self):
+        balance_ids = self.search([('union_id', '=', self.union_id.id)], order='id desc', limit=1)
+        previous_record = balance_ids
+        if previous_record.balance:
+            self.previous_balance = previous_record.balance
+        else:
+            self.previous_balance = 0
 
-    @api.multi
+    @api.one
+    @api.depends('previous_balance')
     def _purse_balance(self):
-        if self.debit:
-            self.balance = self.previous_balance + self.debit
+        self.balance = self.previous_balance + self.debit - self.credit
 
-        elif self.credit:
-            self.balance = self.previous_balance - self.credit
+
 
 
 

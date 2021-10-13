@@ -425,6 +425,23 @@
                 </form>
             </field>
         </record>
+      <record id="ranchy_union_purse_tree" model="ir.ui.view">
+          <field name="name">ranchy.purse.tree</field>
+          <field name="model">union.purse</field>
+          <field name="arch" type="xml">
+              <tree string="Members">
+                  <field name="union_id"/>
+                  <field name="date"/>
+                  <field name="previous_balance"/>
+                  <field name="details"/>
+                  <field name="debit"/>
+                  <field name="credit"/>
+                  <field name="balance"/>
+                  <field name="company_id" groups="base.group_multi_company" invisible="1"/>
+
+              </tree>
+          </field>
+      </record>
 <!--      <record id="scheduled_installments_view_search" model="ir.ui.view">-->
 <!--            <field name="name">scheduled.installments.search</field>-->
 <!--            <field name="model">schedule.installments</field>-->
