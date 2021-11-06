@@ -292,19 +292,27 @@ class UnionPurse(models.Model):
     debit = fields.Float(string='Debit', required=False)
     credit = fields.Float(string='Credit', required=False)
     balance = fields.Float(string='Balance', compute='_purse_balance', required=False, store=True)
-    previous_balance = fields.Float(string='previous balance', compute='_previous_record',)
+    previous_balance = fields.Float(string='previous balance', compute='_previous_record', store=True)
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
 
     @api.one
     @api.depends('union_id', )
     def _previous_record(self):
-        balance_ids = self.search([('union_id', '=', self.union_id.id)], order='id desc', limit=1)
-        previous_record = balance_ids
-        if previous_record.balance:
-            self.previous_balance = previous_record.balance
-        else:
-            self.previous_balance = 0
+        for record in self:
+            balance_ids = self.env['union.purse'].search([('union_id', '=', self.union_id.id), ('id', '<', record.id)], order='id desc', limit=1)
+            previous_record = balance_ids[0]['balance'] if balance_ids else 0
+            self.previous_balance = previous_record
+
+    @api.depends('balance')
+    def get_data(self):
+        for rec in self:
+            if not isinstance(rec.id, models.NewId):
+                previous_balance = 0
+                for previusin in self.search([('id', '<', rec.id)]):
+                    previous_balance += previusin.balance
+                previous_balance += rec.balance
+                rec.previous_balance = previous_balance
 
     @api.one
     @api.depends('previous_balance')
