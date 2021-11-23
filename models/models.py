@@ -279,6 +279,20 @@ class UnionRanchy(models.Model):
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
     union_purse_ids = fields.One2many(comodel_name="union.purse", inverse_name="union_id", string='Purse')
+    union_purse_balance = fields.Float(string="Purse Balance", compute='_compute_purse' )
+
+    @api.multi
+    @api.depends('union_purse_ids')
+    def _compute_purse(self):
+        for record in self:
+            purse_list = []
+            for line in record.union_purse_ids:
+                purse_list.append(line.balance)
+            self.union_purse_balance = purse_list[-1]
+        # last_transaction = self.env['union.purse'].search(['union_id', "=", self.id])[:-1].id
+        # purse_balance = last_transaction.balance
+        # return purse_balance
+
 
 
 class UnionPurse(models.Model):
@@ -339,12 +353,12 @@ class MembersRanchy(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char(string="Name", compute="fullname", required=False)
-    first_name = fields.Char(string="First Name", required=False, track_visibility=True, trace_visibility='onchange', )
-    surname = fields.Char(string="Surname", required=False, track_visibility=True, trace_visibility='onchange', )
+    first_name = fields.Char(string="First Name", required=True, track_visibility=True, trace_visibility='onchange', )
+    surname = fields.Char(string="Surname", required=True, track_visibility=True, trace_visibility='onchange', )
     r_address = fields.Char(string="Residential Address", required=False, track_visibility=True, trace_visibility='onchange', )
     b_address = fields.Char(string="Business Address", required=False,)
     p_address = fields.Char(string="Permanent Address", required=False, track_visibility=True, trace_visibility='onchange',)
-    phone = fields.Char(string="Phone Number", required=False, track_visibility=True, trace_visibility='onchange',)
+    phone = fields.Char(string="Phone Number", required=True, track_visibility=True, trace_visibility='onchange',)
     dob = fields.Date(string="Date of Birth", required=False, )
     marital_status = fields.Selection(string="Marital Status", selection=[('single', 'Single'), ('married', 'Married'),
                                                                           ('divorced', 'Divorced'), ('widow', 'Widow'),
@@ -354,7 +368,7 @@ class MembersRanchy(models.Model):
                                                                         ('tertiary', 'Tertiary'), ], required=False)
     nok = fields.Char(string="next of Kin", required=False, track_visibility=True, trace_visibility='onchange',)
     nok_phone = fields.Char(string="NOK Phone", required=False, track_visibility=True, trace_visibility='onchange',)
-    group_id = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", required=False, track_visibility=True,
+    group_id = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", required=True, track_visibility=True,
                                trace_visibility='onchange', )
     union_card_no = fields.Selection(string="Union Card", selection=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),
                                                            ('6', '6'), ('7', '7'), ('8', '8'), ('9', '9'), ('10', '10'),

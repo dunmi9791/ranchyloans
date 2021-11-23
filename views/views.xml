@@ -168,6 +168,7 @@
                           <group>
                               <field name="co_id"/>
                               <field name="union_day"/>
+                              <field name="union_purse_balance"/>
                           </group>
                       </group>
                       <notebook>
@@ -372,12 +373,16 @@
                   </header>
                   <sheet>
                       <group>
-                          <field name="member_id"/>
-                          <field name="group"/>
-                          <field name="request_date"/>
-                          <field name="disburse_date"/>
-                          <field name="amount"/>
+                          <group>
+                              <field name="member_id"/>
+                              <field name="group"/>
+                              <field name="request_date"/>
+                              <field name="disburse_date"/>
+                         </group>
+                          <group>
+                          <field name="amount" widget="monetary"/>
                           <field name="note"/>
+                        </group>
                       </group>
                   </sheet>
                   <div class="oe_chatter">

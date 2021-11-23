@@ -149,15 +149,16 @@
         <!-- This Menu Item Must have a parent -->
         <menuitem id="ranchy_collection_menu" name="Collections" parent="ranchy_loans_root_menu" sequence="4"/>
         <!-- This Menu Item Must have a parent -->
-        <menuitem id="ranchy_collection_menu" name="Collections" parent="ranchy_loans_root_menu" sequence="5"/>
-        <menuitem id="ranchy_settings_menu" name="Settings" parent="ranchy_loans_root_menu" sequence="6"/>
+        <menuitem id="ranchy_union_menu" name="Unions" parent="ranchy_loans_root_menu" sequence="5"/>
+        <menuitem id="ranchy_report_menu" name="Reports" parent="ranchy_loans_root_menu" sequence="6"/>
+        <menuitem id="ranchy_settings_menu" name="Settings" parent="ranchy_loans_root_menu" sequence="7"/>
 
 
         <!-- This Menu Item must have a parent and an action -->
         <menuitem id="members_ranchy_members_menu" name="Members" parent="ranchy_members_menu" action="members_action" sequence="1"/>
         <menuitem id="loans_ranchy_members_menu" name="Loans" parent="ranchy_loans_menu" action="loans_action" sequence="1"/>
         <menuitem id="loantype_ranchy_menu" name="Loan Type" parent="ranchy_settings_menu" action="loantype_action" sequence="1"/>
-        <menuitem id="union_ranchy_menu" name="Union" parent="ranchy_members_menu" action="union_action" sequence="2"/>
+        <menuitem id="union_ranchy_menu" name="Union" parent="ranchy_union_menu" action="union_action" sequence="2"/>
         <menuitem id="repayment_ranchy_menu" name="Loan Repayment" parent="ranchy_collection_menu" action="collect_loan_amount_wizard" sequence="2"/>
         <menuitem id="savings_ranchy_menu" name="Collect Savings" parent="ranchy_collection_menu" action="collect_savings_amount_wizard" sequence="3"/>
         <menuitem id="withdrawal_ranchy_menu" name="Withdrawals" parent="ranchy_collection_menu" action="withdrawals_action" sequence="3"/>

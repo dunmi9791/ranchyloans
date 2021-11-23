@@ -16,16 +16,24 @@ class WithdrawRequest(models.Model):
 
     request_id = fields.Char(string="Request ID", default=lambda self: _('New'),
                              requires=False, readonly=True, trace_visibility='onchange', )
-    member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", required=False, )
+    member_id = fields.Many2one(comodel_name="members.ranchy", string="Member", required=True, )
     group = fields.Many2one(string="Group/Union", related="member_id.group_id", readonly=True, )
     request_date = fields.Date(string="Date", required=False, default=date.today())
     disburse_date = fields.Date(string="Scheduled Date", required=False,)
-    amount = fields.Integer(string="Requested Amount", required=False, )
+    amount = fields.Integer(string="Requested Amount", required=True, )
     disburse_amount = fields.Integer(string="Disbursed Amount", required=False,)
     note = fields.Text(string="Notes", required=False, )
     state = fields.Selection(string="State", selection=[('draft', 'Draft'), ('requested', 'Requested'),
                                                         ('disbursed', 'Disbursed'), ('rejected', 'Rejected'), ],
                              default='draft', required=False, track_visibility=True, trace_visibility='onchange', )
+    company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
+                                 default=lambda self: self.env.user.company_id)
+    currency_id = fields.Many2one('res.currency', compute='_compute_currency', store=True, string="Currency")
+
+    @api.one
+    @api.depends('company_id')
+    def _compute_currency(self):
+        self.currency_id = self.company_id.currency_id or self.env.user.company_id.currency_id
 
     @api.model
     def create(self, vals):
