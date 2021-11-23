@@ -9,6 +9,7 @@ from datetime import date
 from odoo.tools import float_is_zero, float_compare
 from odoo.tools.safe_eval import safe_eval
 from odoo.addons import decimal_precision as dp
+import re
 
 
 class LoansRanchy(models.Model):
@@ -19,10 +20,10 @@ class LoansRanchy(models.Model):
 
     type = fields.Many2one(comodel_name="loantype.ranchy", string="Loan Type", required=True,
                            track_visibility=True, trace_visibility='onchange' )
-    app_date = fields.Date(string="Date of Application", required=False, )
+    app_date = fields.Date(string="Date of Application", required=False, default=date.today(),)
     member_id = fields.Many2one(comodel_name="members.ranchy", string="", required=True,
                                 track_visibility=True, trace_visibility='onchange',)
-    group = fields.Many2one(string="Group/Union", comodel_name="union.ranchy",)
+    group = fields.Many2one(string="Group/Union", comodel_name="union.ranchy", required=True,)
     avg_monthly = fields.Float(string="Average Monthly Income",  required=False, )
     last_loan = fields.Float(string="Last Loan Received", required=False, )
     date_fullypaid = fields.Date(string="Date Last Loan was Fully Paid", required=False)
@@ -33,7 +34,7 @@ class LoansRanchy(models.Model):
     credit = fields.Monetary(default=0.0, currency_field='currency_id')
     no_install = fields.Integer (string="Number of Installments", related="type.no_installments", readonly=True,)
     duration = fields.Char(string="Loan Duration", required=False)
-    date_first = fields.Date(string="Date First Installment is Due", required=False)
+    date_first = fields.Date(string="Date First Installment is Due", required=True)
     date_last = fields.Date(string="Date Last Installment is Due", required=False)
     is_family = fields.Boolean(string="Any family member registered in the group",  )
     name_family = fields.Char(string="Name of Family Member")
@@ -366,8 +367,8 @@ class MembersRanchy(models.Model):
     formal_edu = fields.Selection(string="Formal Education", selection=[('none', 'None'), ('primary', 'Primary'),
                                                                         ('secondary', 'Secondary'),
                                                                         ('tertiary', 'Tertiary'), ], required=False)
-    nok = fields.Char(string="next of Kin", required=False, track_visibility=True, trace_visibility='onchange',)
-    nok_phone = fields.Char(string="NOK Phone", required=False, track_visibility=True, trace_visibility='onchange',)
+    nok = fields.Char(string="next of Kin", required=True, track_visibility=True, trace_visibility='onchange',)
+    nok_phone = fields.Char(string="NOK Phone", required=True, track_visibility=True, trace_visibility='onchange',)
     group_id = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", required=True, track_visibility=True,
                                trace_visibility='onchange', )
     union_card_no = fields.Selection(string="Union Card", selection=[('1', '1'), ('2', '2'), ('3', '3'), ('4', '4'), ('5', '5'),
@@ -396,6 +397,25 @@ class MembersRanchy(models.Model):
     collection_ids = fields.One2many(comodel_name="collection.ranchy", inverse_name="member", string="Collections")
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
+    email = fields.Char(
+        string='Email',
+        required=False)
+    bvn = fields.Char(string='BVN', required=False)
+    nin = fields.Char(string='NIN', required=False)
+
+    @api.onchange('email')
+    def validate_mail(self):
+        if self.email:
+            match = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', self.email)
+            if match == None:
+                raise ValidationError('Not a valid E-mail ')
+
+    @api.onchange('phone')
+    def validate_phone(self):
+        if self.phone:
+            match = re.match('^(070|080|090|081)\s?\d{2}\s?\d{6}$', self.phone)
+            if match == None:
+                raise ValidationError('Not a recognised Phone Number')
 
     @api.multi
     def name_get(self):
@@ -495,7 +515,6 @@ class ScheduleInstallments(models.Model):
     union = fields.Many2one(comodel_name="union.ranchy", string="Union/Group", related="member.group_id", store=True)
     image = fields.Binary(string="Photo", related="member.m_photo")
     collected = fields.Boolean(string="",  )
-    default = fields.Boolean(string="",)
     member_name = fields.Char(string="Name", related="member.name")
     company_id = fields.Many2one('res.company', string='Branch', required=True, readonly=True,
                                  default=lambda self: self.env.user.company_id)
@@ -503,6 +522,36 @@ class ScheduleInstallments(models.Model):
     collection_loan = fields.Integer(string="Collection (Loan)",)
     collection_savings = fields.Integer(string="Collection(Savings)",)
     no_installments = fields.Integer(string="Number of Installments Paid", required=False, default=1, )
+    default = fields.Boolean(
+        string='Default', compute='_compute_default',
+        required=False)
+    status = fields.Selection(
+        string='Status',
+        selection=[('not yet due', 'Not Yet Due'),
+                   ('due', 'Due'), ('overdue', 'Overdue'), ],
+        compute='_compute_status',
+        required=False, )
+
+
+    @api.multi
+    def _compute_status(self):
+        for rec in self:
+            rec.status = "not yet due"
+            if date.today() < rec.date:
+                rec.status = "not yet due"
+            elif date.today() == rec.date:
+                rec.status = "due"
+            elif date.today() > rec.date:
+                rec.status = "overdue"
+
+
+    @api.multi
+    def _compute_default(self):
+        for rec in self:
+            rec.default = False
+            if date.today() > rec.date and rec.state == "unpaid":
+                rec.default = True
+
 
     @api.onchange('loan_id')
     def _onchange_loan_id(self):

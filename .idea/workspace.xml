@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5778ffae-3c8e-4f82-8825-d3e243f440b7" name="Default Changelist" comment="union purse previous balance">
+    <list default="true" id="5778ffae-3c8e-4f82-8825-d3e243f440b7" name="Default Changelist" comment="union purse balance">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/models/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/models/withdrawal.py" beforeDir="false" afterPath="$PROJECT_DIR$/models/withdrawal.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/views/menus.xml" beforeDir="false" afterPath="$PROJECT_DIR$/views/menus.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/views/views.xml" beforeDir="false" afterPath="$PROJECT_DIR$/views/views.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wizard/collection.py" beforeDir="false" afterPath="$PROJECT_DIR$/wizard/collection.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,7 +37,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../kpi_dashboard" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../suresuccess_exercise" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RunManager" selected="Python.models">
@@ -305,7 +304,14 @@
       <option name="project" value="LOCAL" />
       <updated>1636237594434</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="union purse balance">
+      <created>1637701237448</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1637701237448</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -343,79 +349,80 @@
     <MESSAGE value="rearranged for install" />
     <MESSAGE value="loan adjustments" />
     <MESSAGE value="union purse previous balance" />
-    <option name="LAST_COMMIT_MESSAGE" value="union purse previous balance" />
+    <MESSAGE value="union purse balance" />
+    <option name="LAST_COMMIT_MESSAGE" value="union purse balance" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>183</line>
+          <line>184</line>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>188</line>
+          <line>189</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>197</line>
+          <line>198</line>
           <option name="timeStamp" value="3" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>226</line>
+          <line>227</line>
           <option name="timeStamp" value="4" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>229</line>
+          <line>230</line>
           <option name="timeStamp" value="5" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>231</line>
+          <line>232</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>244</line>
+          <line>245</line>
           <option name="timeStamp" value="7" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>222</line>
+          <line>223</line>
           <option name="timeStamp" value="8" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>196</line>
+          <line>197</line>
           <option name="timeStamp" value="9" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>190</line>
+          <line>191</line>
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>679</line>
+          <line>728</line>
           <option name="timeStamp" value="11" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>685</line>
+          <line>734</line>
           <option name="timeStamp" value="12" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>691</line>
+          <line>740</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>677</line>
+          <line>726</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -425,42 +432,42 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>686</line>
+          <line>735</line>
           <option name="timeStamp" value="25" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>687</line>
+          <line>736</line>
           <option name="timeStamp" value="26" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>688</line>
+          <line>737</line>
           <option name="timeStamp" value="27" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>690</line>
+          <line>739</line>
           <option name="timeStamp" value="30" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>333</line>
+          <line>334</line>
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>332</line>
+          <line>333</line>
           <option name="timeStamp" value="36" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>316</line>
+          <line>317</line>
           <option name="timeStamp" value="37" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/models/models.py</url>
-          <line>318</line>
+          <line>319</line>
           <option name="timeStamp" value="38" />
         </line-breakpoint>
       </breakpoints>

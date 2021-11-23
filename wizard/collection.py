@@ -124,6 +124,12 @@ class WithdrawAmount(models.TransientModel):
         withdrawal.create(vals)
         requestid.disburse_withdrawal()
 
+    @api.constrains('amount')
+    def check_withdrawal_validity(self):
+        for rec in self:
+            if rec.amount > rec.balance:
+                raise UserError(_("Member does not have enough balance to support this withdrawal"))
+
 
 class LapseAdjustments(models.TransientModel):
     _name = 'lapse.adjustment'

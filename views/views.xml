@@ -38,6 +38,9 @@
                        </group>
                        <group>
                            <field name="dob"/>
+                           <field name="bvn"/>
+                           <field name="nin"/>
+                           <field name="email"/>
                            <field name="marital_status"/>
                            <field name="formal_edu"/>
                        </group>
@@ -120,6 +123,8 @@
                                      <field name="date"/>
                                       <field name="installment"/>
                                       <field name="state"/>
+                                      <field name="status"/>
+                                      <field name="default"/>
                                   </tree>
                               </field>
                           </page>
